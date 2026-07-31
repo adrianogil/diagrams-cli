@@ -47,7 +47,7 @@ class MainTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory, "source.json")
-            source.touch()
+            source.write_text('{"nodes": []}', encoding="utf-8")
 
             with contextlib.redirect_stdout(stdout):
                 exit_code = main(
@@ -120,6 +120,34 @@ class MainTests(unittest.TestCase):
         self.assertEqual(
             stdout.getvalue(), f"diagrams-cli {__version__}\n"
         )
+
+    def test_invalid_json_reports_input_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.write_text("{", encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main([str(source)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("invalid JSON", stderr.getvalue())
+        self.assertNotIn("Traceback", stderr.getvalue())
+
+    def test_invalid_schema_reports_validation_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.write_text('{"edges": []}', encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main([str(source)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("document.nodes is required", stderr.getvalue())
+        self.assertNotIn("Traceback", stderr.getvalue())
 
 
 if __name__ == "__main__":

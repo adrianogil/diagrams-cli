@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 
 from diagrams_cli import __version__
+from diagrams_cli.errors import DiagramError
+from diagrams_cli.loader import load_diagram
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +48,12 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"input file does not exist: {args.input}")
     if not source_path.is_file():
         parser.error(f"input path is not a file: {args.input}")
+
+    try:
+        load_diagram(source_path)
+    except DiagramError as error:
+        print(f"diagrams-cli: error: {error}", file=sys.stderr)
+        return 1
 
     print(
         "Placeholder: would generate",
