@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import contextlib
 import io
+import tempfile
 import unittest
+from pathlib import Path
 
 from diagrams_cli import __version__
 from diagrams_cli.cli import build_parser, main
@@ -43,14 +45,46 @@ class MainTests(unittest.TestCase):
     def test_valid_arguments_report_input_and_output_format(self) -> None:
         stdout = io.StringIO()
 
-        with contextlib.redirect_stdout(stdout):
-            exit_code = main(["source.json", "--format", "excalidraw"])
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.touch()
+
+            with contextlib.redirect_stdout(stdout):
+                exit_code = main(
+                    [str(source), "--format", "excalidraw"]
+                )
 
         self.assertEqual(exit_code, 0)
         self.assertEqual(
             stdout.getvalue(),
-            "Placeholder: would generate excalidraw from source.json\n",
+            f"Placeholder: would generate excalidraw from {source}\n",
         )
+
+    def test_missing_source_reports_cli_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "missing.json")
+
+            with contextlib.redirect_stderr(stderr):
+                with self.assertRaisesRegex(SystemExit, "2"):
+                    main([str(source)])
+
+        message = stderr.getvalue()
+        self.assertIn(f"input file does not exist: {source}", message)
+        self.assertNotIn("Traceback", message)
+
+    def test_directory_source_reports_cli_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            with contextlib.redirect_stderr(stderr):
+                with self.assertRaisesRegex(SystemExit, "2"):
+                    main([directory])
+
+        message = stderr.getvalue()
+        self.assertIn(f"input path is not a file: {directory}", message)
+        self.assertNotIn("Traceback", message)
 
     def test_missing_input_prints_help_and_returns_error(self) -> None:
         stdout = io.StringIO()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from diagrams_cli import __version__
 
@@ -39,6 +40,12 @@ def main(argv: list[str] | None = None) -> int:
     if not args.input:
         parser.print_help()
         return 1
+
+    source_path = Path(args.input)
+    if not source_path.exists():
+        parser.error(f"input file does not exist: {args.input}")
+    if not source_path.is_file():
+        parser.error(f"input path is not a file: {args.input}")
 
     print(
         "Placeholder: would generate",
