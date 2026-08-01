@@ -46,6 +46,12 @@ PYTHONPATH=src python -m diagrams_cli examples/04-database-flow.json --format pl
 PYTHONPATH=src python -m diagrams_cli examples/04-database-flow.json --format excalidraw
 ```
 
+Write the PlantUML result safely to a file:
+
+```bash
+diagrams-cli examples/04-database-flow.json -o database-flow.puml
+```
+
 ## Results by output format
 
 | Sample | PlantUML path | Excalidraw path |

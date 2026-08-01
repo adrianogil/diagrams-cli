@@ -18,6 +18,8 @@ class BuildParserTests(unittest.TestCase):
 
         self.assertEqual(args.input, "diagram.json")
         self.assertEqual(args.format, "plantuml")
+        self.assertIsNone(args.output)
+        self.assertFalse(args.force)
 
     def test_parses_input_with_explicit_output_format(self) -> None:
         args = build_parser().parse_args(
@@ -26,6 +28,14 @@ class BuildParserTests(unittest.TestCase):
 
         self.assertEqual(args.input, "diagram.json")
         self.assertEqual(args.format, "excalidraw")
+
+    def test_parses_output_and_force_arguments(self) -> None:
+        args = build_parser().parse_args(
+            ["diagram.json", "-o", "diagram.puml", "--force"]
+        )
+
+        self.assertEqual(args.output, "diagram.puml")
+        self.assertTrue(args.force)
 
     def test_rejects_invalid_output_format(self) -> None:
         stderr = io.StringIO()
@@ -93,6 +103,119 @@ node_1 --> node_2
 """,
         )
 
+    def test_plantuml_output_argument_writes_file_without_stdout(self) -> None:
+        stdout = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.puml")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+
+            with contextlib.redirect_stdout(stdout):
+                exit_code = main([str(source), "-o", str(destination)])
+
+            generated = destination.read_text(encoding="utf-8")
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertEqual(generated, "@startuml\n@enduml\n")
+
+    def test_existing_output_is_preserved_without_force(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.puml")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+            destination.write_text("original", encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main([str(source), "-o", str(destination)])
+
+            preserved = destination.read_text(encoding="utf-8")
+
+        self.assertEqual(exit_code, 1)
+        self.assertEqual(preserved, "original")
+        self.assertIn("use --force to overwrite", stderr.getvalue())
+        self.assertNotIn("Traceback", stderr.getvalue())
+
+    def test_force_overwrites_existing_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.puml")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+            destination.write_text("original", encoding="utf-8")
+
+            exit_code = main(
+                [str(source), "-o", str(destination), "--force"]
+            )
+            generated = destination.read_text(encoding="utf-8")
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(generated, "@startuml\n@enduml\n")
+
+    def test_wrong_output_extension_reports_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.txt")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main([str(source), "-o", str(destination)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertFalse(destination.exists())
+        self.assertIn("must use the .puml extension", stderr.getvalue())
+
+    def test_excalidraw_output_file_is_refused_until_renderer_exists(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.excalidraw")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main(
+                    [
+                        str(source),
+                        "--format",
+                        "excalidraw",
+                        "-o",
+                        str(destination),
+                    ]
+                )
+
+        self.assertEqual(exit_code, 1)
+        self.assertFalse(destination.exists())
+        self.assertIn("renderer is implemented", stderr.getvalue())
+
+    def test_force_without_output_reports_argument_error(self) -> None:
+        stderr = io.StringIO()
+
+        with contextlib.redirect_stderr(stderr):
+            with self.assertRaisesRegex(SystemExit, "2"):
+                main(["diagram.json", "--force"])
+
+        self.assertIn("--force requires --output", stderr.getvalue())
+
+    def test_missing_output_directory_reports_error(self) -> None:
+        stderr = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "missing", "diagram.puml")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+
+            with contextlib.redirect_stderr(stderr):
+                exit_code = main([str(source), "-o", str(destination)])
+
+        self.assertEqual(exit_code, 1)
+        self.assertIn("output directory does not exist", stderr.getvalue())
+        self.assertNotIn("Traceback", stderr.getvalue())
+
     def test_missing_source_reports_cli_error(self) -> None:
         stderr = io.StringIO()
 
@@ -142,6 +265,8 @@ node_1 --> node_2
         self.assertIn(
             "Generate PlantUML and Excalidraw from JSON.", help_text
         )
+        self.assertIn("--output", help_text)
+        self.assertIn("--force", help_text)
 
     def test_version_prints_version_and_exits_successfully(self) -> None:
         stdout = io.StringIO()

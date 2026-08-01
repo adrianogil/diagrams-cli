@@ -27,14 +27,15 @@ PlantUML is the default format, so this is equivalent:
 diagrams-cli examples/04-database-flow.json
 ```
 
-Use shell redirection to save the generated source:
+Write the generated source with the native output option:
 
 ```bash
-diagrams-cli examples/04-database-flow.json > database-flow.puml
+diagrams-cli examples/04-database-flow.json -o database-flow.puml
 ```
 
-The project does not yet provide its own `--output` option or overwrite
-protection. Those remain Phase 3 work.
+Existing files are preserved unless `--force` is supplied. See
+[Output files and overwrite protection](output-files.md) for extension rules,
+filesystem errors, and the complete overwrite contract.
 
 ## Python API
 
@@ -163,7 +164,7 @@ plantuml -checkonly examples/plantuml/*.puml
 
 - Excalidraw generation remains an explicit placeholder.
 - The CLI accepts only file input; stdin support is planned.
-- There is no `--output`, extension validation, or overwrite protection yet.
+- Explicit `-` stdin/stdout paths are not implemented yet.
 - The renderer emits PlantUML source but does not invoke PlantUML to create an
   image.
 

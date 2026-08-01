@@ -23,6 +23,8 @@ The Excalidraw renderer remains planned work.
 - `diagrams_cli.errors` provides the expected input-error hierarchy.
 - `diagrams_cli.renderers` defines the common callable renderer interface.
 - `diagrams_cli.renderers.plantuml` produces deterministic PlantUML source.
+- `diagrams_cli.output` validates format extensions and writes output without
+  implicit overwrites.
 - `diagrams_cli.cli` handles CLI arguments and reports loading or validation
   failures without a traceback, renders PlantUML to stdout, and retains an
   explicit Excalidraw placeholder.
@@ -159,7 +161,7 @@ argument and path checks retain their current CLI behavior.
 ## Current limitations
 
 - Excalidraw content is not generated yet.
-- No output-file option exists yet.
+- Excalidraw file output is unavailable until its renderer is implemented.
 - Input is file-only at the CLI layer; `loads_diagram` already supports the
   future stdin path.
 - PlantUML source is written to stdout; image rendering is not invoked.

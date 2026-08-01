@@ -50,23 +50,29 @@ Acceptance result: all ten example inputs produce byte-stable golden PlantUML
 files, the CLI writes generated source to stdout, unsafe source IDs never
 become aliases, and every golden file passes local PlantUML syntax checking.
 
-## Phase 3: Output handling and CLI conventions
+## Phase 3: Output handling and CLI conventions — in progress
 
-- [ ] Add `--output/-o` with stdout as the default.
+- [x] Add `--output/-o` with stdout as the default.
 - [ ] Support `-` for stdin and stdout.
-- [ ] Validate `.puml` and `.excalidraw` extensions when a path is supplied.
-- [ ] Refuse to overwrite existing files unless `--force` is present.
-- [ ] Report filesystem errors without tracebacks.
+- [x] Validate `.puml` and `.excalidraw` extensions when a path is supplied.
+- [x] Refuse to overwrite existing files unless `--force` is present.
+- [x] Report filesystem errors without tracebacks.
 - [ ] Make the positional input argument required through `argparse` or
       document the stdin exception clearly.
 - [ ] Standardize exit codes and stderr behavior.
-- [ ] Add temporary-directory CLI integration tests.
+- [x] Add temporary-directory CLI integration tests.
 
 Acceptance criteria:
 
 - Pipes and files both work predictably.
 - Existing user files are never overwritten implicitly.
 - Help text documents defaults and output rules.
+
+Progress result: PlantUML supports stdout and protected `.puml` files,
+extensions are format-aware, exclusive creation prevents overwrite races, and
+`--force` explicitly enables replacement. Excalidraw file creation remains
+disabled until its renderer exists; explicit `-` streams and broader CLI
+convention cleanup remain open.
 
 ## Phase 4: Excalidraw layout and renderer
 

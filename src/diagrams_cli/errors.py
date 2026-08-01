@@ -1,4 +1,4 @@
-"""Application errors raised while loading diagram descriptions."""
+"""Expected application errors for diagram conversion workflows."""
 
 
 class DiagramError(ValueError):
@@ -11,3 +11,7 @@ class DiagramLoadError(DiagramError):
 
 class DiagramValidationError(DiagramError):
     """Raised when decoded JSON does not match the diagram schema."""
+
+
+class DiagramOutputError(DiagramError):
+    """Raised when generated output cannot be safely written."""
