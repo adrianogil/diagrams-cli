@@ -104,3 +104,9 @@ The sample inputs now serve as renderer fixtures:
 - Excalidraw runs are compared with byte-stable `.excalidraw` JSON and
   structurally checked for metadata, element arrays, and non-overlapping node
   placements.
+- Installed subprocess tests compare all ten PlantUML results through
+  `diagrams-cli` and all ten Excalidraw results through
+  `python -m diagrams_cli`.
+
+See [Testing and golden fixtures](testing.md) for the fixture contract,
+installed-wheel isolation, coverage matrix, and regeneration workflow.

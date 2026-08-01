@@ -16,6 +16,22 @@ See the detailed documentation:
 - [Output files and overwrite protection](docs/output-files.md)
 - [Implementation plan](docs/implementation-plan.md)
 - [Ten progressively complex samples](docs/samples.md)
+- [Testing, golden fixtures, and installed CLI coverage](docs/testing.md)
+
+## Installation
+
+Install from a local checkout:
+
+```bash
+python -m pip install .
+```
+
+This provides both supported command forms:
+
+```bash
+diagrams-cli --version
+python -m diagrams_cli --version
+```
 
 Generate PlantUML from an example:
 
@@ -31,6 +47,9 @@ diagrams-cli examples/04-database-flow.json \
   --format excalidraw \
   -o database-flow.excalidraw
 ```
+
+Both commands are exercised from an isolated wheel installation by the
+end-to-end test suite.
 
 ## Development checks
 

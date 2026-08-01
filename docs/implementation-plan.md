@@ -99,13 +99,14 @@ stdout and protected `.excalidraw` files.
 
 ## Phase 5: Packaging, automation, and documentation
 
-- [ ] Add installed-command tests for `diagrams-cli` and
+- [x] Add installed-command tests for `diagrams-cli` and
       `python -m diagrams_cli`.
+- [x] Compare both installed entry points with renderer golden fixtures.
 - [ ] Add CI across supported Python versions.
 - [ ] Add linting, formatting, type checking, and coverage configuration.
 - [ ] Build and inspect wheel and source distributions.
 - [ ] Use one source of truth for the package version.
-- [ ] Complete README installation and end-to-end examples.
+- [x] Complete README installation and end-to-end examples.
 - [ ] Add troubleshooting and exit-code references.
 - [ ] Document schema compatibility and future evolution rules.
 
@@ -114,6 +115,15 @@ Acceptance criteria:
 - CI verifies tests, compilation, builds, and installed entry points.
 - A new user can install the package and generate both formats from the
   documented example.
+
+Progress result: the test suite builds a wheel without network-dependent build
+isolation, installs it into a temporary virtual environment, removes source
+checkout import paths, and exercises both installed entry points as
+subprocesses. All ten PlantUML and all ten Excalidraw stdout results are checked
+byte-for-byte, and file output, overwrite protection, help, version, invalid
+JSON, and extension errors are covered. CI, static-analysis configuration,
+source-distribution inspection, centralized versioning, troubleshooting, and
+schema-evolution documentation remain open.
 
 ## Deferred extensions
 
