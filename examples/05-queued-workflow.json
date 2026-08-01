@@ -1,0 +1,43 @@
+{
+  "title": "Queued Report Generation",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "operator",
+      "label": "Operator",
+      "type": "actor"
+    },
+    {
+      "id": "report-api",
+      "label": "Report API",
+      "type": "service"
+    },
+    {
+      "id": "report-queue",
+      "label": "Report Queue",
+      "type": "queue"
+    },
+    {
+      "id": "report-worker",
+      "label": "Report Worker",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "operator",
+      "to": "report-api",
+      "label": "Submit report"
+    },
+    {
+      "from": "report-api",
+      "to": "report-queue",
+      "label": "Enqueue job"
+    },
+    {
+      "from": "report-queue",
+      "to": "report-worker",
+      "label": "Consume job"
+    }
+  ]
+}

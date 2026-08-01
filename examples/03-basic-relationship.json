@@ -1,0 +1,23 @@
+{
+  "title": "Client and API",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Web Client",
+      "type": "actor"
+    },
+    {
+      "id": "api",
+      "label": "Public API",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client",
+      "to": "api",
+      "label": "HTTPS request"
+    }
+  ]
+}

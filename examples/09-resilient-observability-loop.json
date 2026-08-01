@@ -1,0 +1,138 @@
+{
+  "title": "Resilient Processing with Observability",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "producer",
+      "label": "Event Producer",
+      "type": "service"
+    },
+    {
+      "id": "events",
+      "label": "Event Queue",
+      "type": "queue"
+    },
+    {
+      "id": "processor",
+      "label": "Event Processor",
+      "type": "service"
+    },
+    {
+      "id": "primary-db",
+      "label": "Primary Database",
+      "type": "database"
+    },
+    {
+      "id": "retry-queue",
+      "label": "Retry Queue",
+      "type": "queue"
+    },
+    {
+      "id": "dead-letter-queue",
+      "label": "Dead Letter Queue",
+      "type": "queue"
+    },
+    {
+      "id": "metrics",
+      "label": "Metrics Collector",
+      "type": "service"
+    },
+    {
+      "id": "alerts",
+      "label": "Alert Manager",
+      "type": "service"
+    },
+    {
+      "id": "operator",
+      "label": "On-Call Operator",
+      "type": "actor"
+    },
+    {
+      "id": "operations-dashboard",
+      "label": "Operations Dashboard",
+      "type": "generic"
+    },
+    {
+      "id": "replay-tool",
+      "label": "Replay Tool",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "producer",
+      "to": "events",
+      "label": "Publish event"
+    },
+    {
+      "from": "events",
+      "to": "processor",
+      "label": "Consume event"
+    },
+    {
+      "from": "processor",
+      "to": "primary-db",
+      "label": "Persist result"
+    },
+    {
+      "from": "processor",
+      "to": "retry-queue",
+      "label": "Temporary failure"
+    },
+    {
+      "from": "retry-queue",
+      "to": "processor",
+      "label": "Retry"
+    },
+    {
+      "from": "processor",
+      "to": "dead-letter-queue",
+      "label": "Permanent failure"
+    },
+    {
+      "from": "processor",
+      "to": "metrics",
+      "label": "Emit metrics"
+    },
+    {
+      "from": "events",
+      "to": "metrics",
+      "label": "Queue depth"
+    },
+    {
+      "from": "metrics",
+      "to": "alerts",
+      "label": "Threshold exceeded"
+    },
+    {
+      "from": "metrics",
+      "to": "operations-dashboard",
+      "label": "Display health"
+    },
+    {
+      "from": "alerts",
+      "to": "operator",
+      "label": "Page operator"
+    },
+    {
+      "from": "operator",
+      "to": "operations-dashboard",
+      "label": "Investigate"
+    },
+    {
+      "from": "operator",
+      "to": "replay-tool",
+      "label": "Start replay"
+    },
+    {
+      "from": "dead-letter-queue",
+      "to": "replay-tool",
+      "label": "Load failed events"
+    },
+    {
+      "from": "replay-tool",
+      "to": "events",
+      "label": "Republish event"
+    }
+  ]
+}

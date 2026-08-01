@@ -1,0 +1,103 @@
+{
+  "title": "Storefront Microservices",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "shopper",
+      "label": "Shopper",
+      "type": "actor"
+    },
+    {
+      "id": "storefront",
+      "label": "Web Storefront",
+      "type": "service"
+    },
+    {
+      "id": "gateway",
+      "label": "API Gateway",
+      "type": "service"
+    },
+    {
+      "id": "identity",
+      "label": "Identity Service",
+      "type": "service"
+    },
+    {
+      "id": "catalog",
+      "label": "Catalog Service",
+      "type": "service"
+    },
+    {
+      "id": "orders",
+      "label": "Orders Service",
+      "type": "service"
+    },
+    {
+      "id": "identity-db",
+      "label": "Identity Database",
+      "type": "database"
+    },
+    {
+      "id": "catalog-db",
+      "label": "Catalog Database",
+      "type": "database"
+    },
+    {
+      "id": "orders-db",
+      "label": "Orders Database",
+      "type": "database"
+    }
+  ],
+  "edges": [
+    {
+      "from": "shopper",
+      "to": "storefront",
+      "label": "Browse store"
+    },
+    {
+      "from": "storefront",
+      "to": "gateway",
+      "label": "API calls"
+    },
+    {
+      "from": "gateway",
+      "to": "identity",
+      "label": "Authenticate"
+    },
+    {
+      "from": "gateway",
+      "to": "catalog",
+      "label": "Browse catalog"
+    },
+    {
+      "from": "gateway",
+      "to": "orders",
+      "label": "Manage orders"
+    },
+    {
+      "from": "identity",
+      "to": "identity-db",
+      "label": "Read identity"
+    },
+    {
+      "from": "catalog",
+      "to": "catalog-db",
+      "label": "Read products"
+    },
+    {
+      "from": "orders",
+      "to": "orders-db",
+      "label": "Persist order"
+    },
+    {
+      "from": "orders",
+      "to": "catalog",
+      "label": "Check product"
+    },
+    {
+      "from": "orders",
+      "to": "identity",
+      "label": "Check customer"
+    }
+  ]
+}

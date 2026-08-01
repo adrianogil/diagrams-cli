@@ -1,0 +1,68 @@
+{
+  "title": "Event-Driven Ordering",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "type": "actor"
+    },
+    {
+      "id": "orders-api",
+      "label": "Orders API",
+      "type": "service"
+    },
+    {
+      "id": "orders-db",
+      "label": "Orders Database",
+      "type": "database"
+    },
+    {
+      "id": "orders-events",
+      "label": "Order Events",
+      "type": "queue"
+    },
+    {
+      "id": "fulfillment-worker",
+      "label": "Fulfillment Worker",
+      "type": "service"
+    },
+    {
+      "id": "warehouse",
+      "label": "Warehouse System",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "customer",
+      "to": "orders-api",
+      "label": "Place order"
+    },
+    {
+      "from": "orders-api",
+      "to": "orders-db",
+      "label": "Store order"
+    },
+    {
+      "from": "orders-api",
+      "to": "orders-events",
+      "label": "Publish OrderCreated"
+    },
+    {
+      "from": "orders-events",
+      "to": "fulfillment-worker",
+      "label": "Consume event"
+    },
+    {
+      "from": "fulfillment-worker",
+      "to": "warehouse",
+      "label": "Reserve stock"
+    },
+    {
+      "from": "fulfillment-worker",
+      "to": "orders-db",
+      "label": "Update status"
+    }
+  ]
+}

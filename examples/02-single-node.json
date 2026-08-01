@@ -1,0 +1,9 @@
+{
+  "title": "Single Component",
+  "nodes": [
+    {
+      "id": "component",
+      "label": "Standalone Component"
+    }
+  ]
+}

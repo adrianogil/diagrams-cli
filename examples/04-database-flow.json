@@ -1,0 +1,33 @@
+{
+  "title": "Profile Lookup",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "user",
+      "label": "User",
+      "type": "actor"
+    },
+    {
+      "id": "profile-api",
+      "label": "Profile API",
+      "type": "service"
+    },
+    {
+      "id": "profile-db",
+      "label": "Profile Database",
+      "type": "database"
+    }
+  ],
+  "edges": [
+    {
+      "from": "user",
+      "to": "profile-api",
+      "label": "Request profile"
+    },
+    {
+      "from": "profile-api",
+      "to": "profile-db",
+      "label": "Read profile"
+    }
+  ]
+}

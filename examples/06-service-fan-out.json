@@ -1,0 +1,58 @@
+{
+  "title": "Dashboard Aggregation",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "dashboard",
+      "label": "Dashboard",
+      "type": "actor"
+    },
+    {
+      "id": "gateway",
+      "label": "API Gateway",
+      "type": "service"
+    },
+    {
+      "id": "sales-service",
+      "label": "Sales Service",
+      "type": "service"
+    },
+    {
+      "id": "inventory-service",
+      "label": "Inventory Service",
+      "type": "service"
+    },
+    {
+      "id": "dashboard-view",
+      "label": "Aggregated View",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "dashboard",
+      "to": "gateway",
+      "label": "Load dashboard"
+    },
+    {
+      "from": "gateway",
+      "to": "sales-service",
+      "label": "Fetch sales"
+    },
+    {
+      "from": "gateway",
+      "to": "inventory-service",
+      "label": "Fetch inventory"
+    },
+    {
+      "from": "sales-service",
+      "to": "dashboard-view",
+      "label": "Sales data"
+    },
+    {
+      "from": "inventory-service",
+      "to": "dashboard-view",
+      "label": "Inventory data"
+    }
+  ]
+}

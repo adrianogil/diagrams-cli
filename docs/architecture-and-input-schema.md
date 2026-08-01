@@ -162,3 +162,6 @@ argument and path checks retain their current CLI behavior.
   future stdin path.
 - Styling, groups, node coordinates, and renderer-specific options are not
   part of the initial portable schema.
+
+Ten progressively complex inputs and the recorded results from both CLI format
+paths are available in [Sample diagrams](samples.md).

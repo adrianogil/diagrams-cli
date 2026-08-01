@@ -23,6 +23,8 @@ input -> decode -> validate -> diagram model -> optional layout -> renderer -> o
 - [x] Integrate loading and validation into the current CLI.
 - [x] Add unit and CLI tests for successful and failing inputs.
 - [x] Document the schema, API, errors, and current limitations.
+- [x] Add ten progressively complex validated examples.
+- [x] Record CLI results for both format selections.
 
 Acceptance result: valid JSON reaches the existing explicit placeholder;
 invalid JSON or schema input produces a concise error without a traceback.

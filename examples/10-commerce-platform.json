@@ -1,0 +1,193 @@
+{
+  "title": "Commerce Platform",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "type": "actor"
+    },
+    {
+      "id": "support-agent",
+      "label": "Support Agent",
+      "type": "actor"
+    },
+    {
+      "id": "web-app",
+      "label": "Web Application",
+      "type": "service"
+    },
+    {
+      "id": "api-gateway",
+      "label": "API Gateway",
+      "type": "service"
+    },
+    {
+      "id": "identity-service",
+      "label": "Identity Service",
+      "type": "service"
+    },
+    {
+      "id": "catalog-service",
+      "label": "Catalog Service",
+      "type": "service"
+    },
+    {
+      "id": "order-service",
+      "label": "Order Service",
+      "type": "service"
+    },
+    {
+      "id": "payment-service",
+      "label": "Payment Service",
+      "type": "service"
+    },
+    {
+      "id": "notification-service",
+      "label": "Notification Service",
+      "type": "service"
+    },
+    {
+      "id": "fulfillment-worker",
+      "label": "Fulfillment Worker",
+      "type": "service"
+    },
+    {
+      "id": "identity-db",
+      "label": "Identity Database",
+      "type": "database"
+    },
+    {
+      "id": "catalog-db",
+      "label": "Catalog Database",
+      "type": "database"
+    },
+    {
+      "id": "orders-db",
+      "label": "Orders Database",
+      "type": "database"
+    },
+    {
+      "id": "order-events",
+      "label": "Order Event Bus",
+      "type": "queue"
+    },
+    {
+      "id": "audit-log",
+      "label": "Audit Log",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "customer",
+      "to": "web-app",
+      "label": "Shop"
+    },
+    {
+      "from": "support-agent",
+      "to": "web-app",
+      "label": "Assist customer"
+    },
+    {
+      "from": "web-app",
+      "to": "api-gateway",
+      "label": "API requests"
+    },
+    {
+      "from": "api-gateway",
+      "to": "identity-service",
+      "label": "Authenticate"
+    },
+    {
+      "from": "api-gateway",
+      "to": "catalog-service",
+      "label": "Browse catalog"
+    },
+    {
+      "from": "api-gateway",
+      "to": "order-service",
+      "label": "Manage order"
+    },
+    {
+      "from": "identity-service",
+      "to": "identity-db",
+      "label": "Read identity"
+    },
+    {
+      "from": "catalog-service",
+      "to": "catalog-db",
+      "label": "Read inventory"
+    },
+    {
+      "from": "order-service",
+      "to": "identity-service",
+      "label": "Verify customer"
+    },
+    {
+      "from": "order-service",
+      "to": "catalog-service",
+      "label": "Reserve inventory"
+    },
+    {
+      "from": "order-service",
+      "to": "payment-service",
+      "label": "Authorize payment"
+    },
+    {
+      "from": "order-service",
+      "to": "orders-db",
+      "label": "Persist order"
+    },
+    {
+      "from": "order-service",
+      "to": "order-events",
+      "label": "Publish OrderCreated"
+    },
+    {
+      "from": "payment-service",
+      "to": "order-events",
+      "label": "Publish PaymentAuthorized"
+    },
+    {
+      "from": "order-events",
+      "to": "notification-service",
+      "label": "Notify customer"
+    },
+    {
+      "from": "order-events",
+      "to": "fulfillment-worker",
+      "label": "Start fulfillment"
+    },
+    {
+      "from": "fulfillment-worker",
+      "to": "catalog-service",
+      "label": "Commit inventory"
+    },
+    {
+      "from": "fulfillment-worker",
+      "to": "orders-db",
+      "label": "Update fulfillment"
+    },
+    {
+      "from": "identity-service",
+      "to": "audit-log",
+      "label": "Record access"
+    },
+    {
+      "from": "payment-service",
+      "to": "audit-log",
+      "label": "Record payment"
+    },
+    {
+      "from": "order-service",
+      "to": "audit-log",
+      "label": "Record order"
+    },
+    {
+      "from": "notification-service",
+      "to": "customer",
+      "label": "Send confirmation"
+    }
+  ]
+}
