@@ -162,7 +162,6 @@ plantuml -checkonly examples/plantuml/*.puml
 
 ## Remaining limitations
 
-- Excalidraw generation remains an explicit placeholder.
 - The CLI accepts only file input; stdin support is planned.
 - Explicit `-` stdin/stdout paths are not implemented yet.
 - The renderer emits PlantUML source but does not invoke PlantUML to create an

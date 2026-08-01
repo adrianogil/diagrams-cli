@@ -68,29 +68,34 @@ Acceptance criteria:
 - Existing user files are never overwritten implicitly.
 - Help text documents defaults and output rules.
 
-Progress result: PlantUML supports stdout and protected `.puml` files,
-extensions are format-aware, exclusive creation prevents overwrite races, and
-`--force` explicitly enables replacement. Excalidraw file creation remains
-disabled until its renderer exists; explicit `-` streams and broader CLI
-convention cleanup remain open.
+Progress result: both renderers support stdout and protected format-specific
+files, extensions are format-aware, exclusive creation prevents overwrite
+races, and `--force` explicitly enables replacement. Explicit `-` streams and
+broader CLI convention cleanup remain open.
 
-## Phase 4: Excalidraw layout and renderer
+## Phase 4: Excalidraw layout and renderer — complete
 
-- [ ] Define a deterministic layered-layout result model.
-- [ ] Place nodes by graph depth for both supported directions.
-- [ ] Handle disconnected nodes and graph cycles predictably.
-- [ ] Render node shapes, labels, and bound arrows.
-- [ ] Map portable node types to a small visual vocabulary.
-- [ ] Emit required Excalidraw document metadata.
-- [ ] Derive stable element IDs without timestamps or randomness.
-- [ ] Add golden `.excalidraw` fixtures and structural assertions.
-- [ ] Replace the Excalidraw placeholder path with generated JSON.
+- [x] Define a deterministic layered-layout result model.
+- [x] Place nodes by graph depth for both supported directions.
+- [x] Handle disconnected nodes and graph cycles predictably.
+- [x] Render node shapes, labels, and bound arrows.
+- [x] Map portable node types to a small visual vocabulary.
+- [x] Emit required Excalidraw document metadata.
+- [x] Derive stable element IDs without timestamps or randomness.
+- [x] Add golden `.excalidraw` fixtures and structural assertions.
+- [x] Replace the Excalidraw placeholder path with generated JSON.
 
 Acceptance criteria:
 
 - Generated files open in Excalidraw.
 - Nodes do not overlap in the supported fixture set.
 - Repeated runs produce reviewable, deterministic output.
+
+Acceptance result: all ten examples produce byte-stable Excalidraw version 2
+documents with non-overlapping node placements, stable metadata, bound arrows,
+and editable text. Strongly connected components make cycles finite and
+predictable, disconnected nodes retain input order, and the CLI supports both
+stdout and protected `.excalidraw` files.
 
 ## Phase 5: Packaging, automation, and documentation
 

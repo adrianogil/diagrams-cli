@@ -2,18 +2,14 @@
 
 ## Status
 
-`diagrams-cli` can write generated PlantUML source directly to a file with
-`--output/-o`. Standard output remains the default when no output path is
-given.
+`diagrams-cli` can write generated PlantUML source or Excalidraw JSON directly
+to a file with `--output/-o`. Standard output remains the default when no
+output path is given.
 
 ```text
 Diagram -> renderer -> stdout
                     `-> validated output path -> protected UTF-8 file
 ```
-
-Excalidraw output paths are validated, but file creation is refused until the
-Excalidraw renderer is implemented. The CLI never writes placeholder text into
-an `.excalidraw` document.
 
 ## Basic usage
 
@@ -37,6 +33,14 @@ diagrams-cli examples/04-database-flow.json -o database-flow.puml
 ```
 
 Successful file output writes nothing to stdout.
+
+Create an Excalidraw document:
+
+```bash
+diagrams-cli examples/04-database-flow.json \
+  --format excalidraw \
+  -o database-flow.excalidraw
+```
 
 ## Extension rules
 
@@ -93,20 +97,6 @@ replace.
 - Invalid CLI combinations such as `--force` without `--output` use
   `argparse`'s exit code `2`.
 
-## Excalidraw boundary
-
-This command validates the `.excalidraw` extension but returns an error and
-does not create a file:
-
-```bash
-diagrams-cli architecture.json \
-  --format excalidraw \
-  --output architecture.excalidraw
-```
-
-File writing will become available automatically once the Excalidraw renderer
-replaces its current placeholder path.
-
 ## Python API
 
 Validate a destination without writing:
@@ -145,11 +135,10 @@ Unit and CLI integration tests cover:
 - Explicit forced replacement
 - Missing parent directories and directory destinations
 - `--force` without `--output`
-- Refusal to create placeholder Excalidraw files
+- Excalidraw JSON file creation and overwrite protection
 
 ## Remaining output roadmap
 
 - Support `-` as an explicit stdin/stdout path.
 - Make the positional input behavior consistent with future stdin support.
 - Finish standardizing exit-code and stderr conventions.
-- Enable `.excalidraw` file writing after its renderer exists.

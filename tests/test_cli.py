@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -52,7 +53,7 @@ class BuildParserTests(unittest.TestCase):
 
 
 class MainTests(unittest.TestCase):
-    def test_excalidraw_arguments_report_placeholder(self) -> None:
+    def test_excalidraw_arguments_render_json_to_stdout(self) -> None:
         stdout = io.StringIO()
 
         with tempfile.TemporaryDirectory() as directory:
@@ -65,10 +66,9 @@ class MainTests(unittest.TestCase):
                 )
 
         self.assertEqual(exit_code, 0)
-        self.assertEqual(
-            stdout.getvalue(),
-            f"Placeholder: would generate excalidraw from {source}\n",
-        )
+        document = json.loads(stdout.getvalue())
+        self.assertEqual(document["type"], "excalidraw")
+        self.assertEqual(document["elements"], [])
 
     def test_plantuml_arguments_render_to_stdout(self) -> None:
         stdout = io.StringIO()
@@ -169,28 +169,25 @@ node_1 --> node_2
         self.assertFalse(destination.exists())
         self.assertIn("must use the .puml extension", stderr.getvalue())
 
-    def test_excalidraw_output_file_is_refused_until_renderer_exists(self) -> None:
-        stderr = io.StringIO()
-
+    def test_excalidraw_output_argument_writes_generated_document(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory, "source.json")
             destination = Path(directory, "diagram.excalidraw")
             source.write_text('{"nodes": []}', encoding="utf-8")
 
-            with contextlib.redirect_stderr(stderr):
-                exit_code = main(
-                    [
-                        str(source),
-                        "--format",
-                        "excalidraw",
-                        "-o",
-                        str(destination),
-                    ]
-                )
+            exit_code = main(
+                [
+                    str(source),
+                    "--format",
+                    "excalidraw",
+                    "-o",
+                    str(destination),
+                ]
+            )
+            document = json.loads(destination.read_text(encoding="utf-8"))
 
-        self.assertEqual(exit_code, 1)
-        self.assertFalse(destination.exists())
-        self.assertIn("renderer is implemented", stderr.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(document["type"], "excalidraw")
 
     def test_force_without_output_reports_argument_error(self) -> None:
         stderr = io.StringIO()

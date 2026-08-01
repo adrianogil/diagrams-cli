@@ -10,7 +10,7 @@ from diagrams_cli import __version__
 from diagrams_cli.errors import DiagramError
 from diagrams_cli.loader import load_diagram
 from diagrams_cli.output import validate_output_path, write_output_file
-from diagrams_cli.renderers import render_plantuml
+from diagrams_cli.renderers import render_excalidraw, render_plantuml
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -32,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--format",
         choices=["plantuml", "excalidraw"],
         default="plantuml",
-        help="Output format; Excalidraw is currently a placeholder.",
+        help="Output format; defaults to plantuml.",
     )
     parser.add_argument(
         "--output",
@@ -76,38 +76,23 @@ def main(argv: list[str] | None = None) -> int:
         print(f"diagrams-cli: error: {error}", file=sys.stderr)
         return 1
 
-    if args.format == "plantuml":
-        rendered = render_plantuml(diagram)
-        if args.output:
-            try:
-                write_output_file(
-                    rendered,
-                    args.output,
-                    args.format,
-                    force=args.force,
-                )
-            except DiagramError as error:
-                print(f"diagrams-cli: error: {error}", file=sys.stderr)
-                return 1
-        else:
-            print(rendered, end="", file=sys.stdout)
-        return 0
-
-    if args.output:
-        print(
-            "diagrams-cli: error: Excalidraw file output is unavailable "
-            "until its renderer is implemented",
-            file=sys.stderr,
-        )
-        return 1
-
-    print(
-        "Placeholder: would generate",
-        args.format,
-        "from",
-        args.input,
-        file=sys.stdout,
+    renderer = (
+        render_plantuml if args.format == "plantuml" else render_excalidraw
     )
+    rendered = renderer(diagram)
+    if args.output:
+        try:
+            write_output_file(
+                rendered,
+                args.output,
+                args.format,
+                force=args.force,
+            )
+        except DiagramError as error:
+            print(f"diagrams-cli: error: {error}", file=sys.stderr)
+            return 1
+    else:
+        print(rendered, end="", file=sys.stdout)
     return 0
 
 

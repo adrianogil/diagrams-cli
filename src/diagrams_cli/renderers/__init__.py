@@ -5,8 +5,9 @@ from __future__ import annotations
 from typing import Callable
 
 from diagrams_cli.model import Diagram
+from diagrams_cli.renderers.excalidraw import render_excalidraw
 from diagrams_cli.renderers.plantuml import render_plantuml
 
 Renderer = Callable[[Diagram], str]
 
-__all__ = ["Renderer", "render_plantuml"]
+__all__ = ["Renderer", "render_excalidraw", "render_plantuml"]

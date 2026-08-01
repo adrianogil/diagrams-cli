@@ -2,15 +2,14 @@
 
 ## Current status
 
-`diagrams-cli` implements the validated input pipeline and PlantUML output:
+`diagrams-cli` implements the validated input pipeline and both renderers:
 
 ```text
 UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
                                                         |-> PlantUML stdout
-                                                        `-> Excalidraw placeholder
+                                                        `-> layered layout
+                                                             `-> Excalidraw JSON
 ```
-
-The Excalidraw renderer remains planned work.
 
 ## Package responsibilities
 
@@ -23,11 +22,15 @@ The Excalidraw renderer remains planned work.
 - `diagrams_cli.errors` provides the expected input-error hierarchy.
 - `diagrams_cli.renderers` defines the common callable renderer interface.
 - `diagrams_cli.renderers.plantuml` produces deterministic PlantUML source.
+- `diagrams_cli.layout` assigns deterministic, non-overlapping node positions
+  by graph depth, direction, and input order.
+- `diagrams_cli.renderers.excalidraw` produces deterministic editable
+  Excalidraw JSON with shapes, labels, and bound arrows.
 - `diagrams_cli.output` validates format extensions and writes output without
   implicit overwrites.
 - `diagrams_cli.cli` handles CLI arguments and reports loading or validation
-  failures without a traceback, renders PlantUML to stdout, and retains an
-  explicit Excalidraw placeholder.
+  failures without a traceback and selects either real renderer for stdout or
+  protected file output.
 
 Keeping the input model independent from output formats allows PlantUML and
 Excalidraw renderers to consume the same validated diagram.
@@ -160,13 +163,13 @@ argument and path checks retain their current CLI behavior.
 
 ## Current limitations
 
-- Excalidraw content is not generated yet.
-- Excalidraw file output is unavailable until its renderer is implemented.
 - Input is file-only at the CLI layer; `loads_diagram` already supports the
   future stdin path.
 - PlantUML source is written to stdout; image rendering is not invoked.
 - Styling, groups, node coordinates, and renderer-specific options are not
   part of the initial portable schema.
+- Excalidraw layout does not route arrows or labels around unrelated elements.
 
-Ten progressively complex inputs and the recorded results from both CLI format
-paths are available in [Sample diagrams](samples.md).
+Ten progressively complex inputs and golden results from both CLI format paths
+are available in [Sample diagrams](samples.md). Layout and output details are
+covered in [Excalidraw renderer](excalidraw-renderer.md).
