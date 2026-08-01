@@ -1,0 +1,29 @@
+@startuml
+title Multi-Region Failover
+left to right direction
+
+actor "Global User" as node_1
+rectangle "Global Traffic Manager" as node_2
+component "Region A Gateway" as node_3
+component "Region B Gateway" as node_4
+component "Region A Service" as node_5
+component "Region B Service" as node_6
+database "Region A Database" as node_7
+database "Region B Database" as node_8
+queue "Replication Stream" as node_9
+component "Global Health Service" as node_10
+
+node_1 --> node_2 : Resolve endpoint
+node_2 --> node_3 : Primary route
+node_2 --> node_4 : Failover route
+node_3 --> node_5 : Forward request
+node_4 --> node_6 : Forward request
+node_5 --> node_7 : Read and write
+node_6 --> node_8 : Read and write
+node_7 --> node_9 : Publish changes
+node_9 --> node_8 : Apply changes
+node_8 --> node_9 : Publish recovery changes
+node_10 --> node_3 : Probe region
+node_10 --> node_4 : Probe region
+node_10 --> node_2 : Update routing
+@enduml

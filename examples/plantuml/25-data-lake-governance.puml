@@ -1,0 +1,27 @@
+@startuml
+title Governed Data Lake
+
+actor "Source Owner" as node_1
+component "Batch Ingestion" as node_2
+queue "Streaming Ingestion" as node_3
+database "Raw Data Zone" as node_4
+rectangle "Metadata Catalog" as node_5
+component "Quality Service" as node_6
+database "Curated Data Zone" as node_7
+component "Query Engine" as node_8
+actor "Data Scientist" as node_9
+rectangle "Governance Policies" as node_10
+
+node_1 --> node_2 : Upload batch
+node_1 --> node_3 : Publish stream
+node_2 --> node_4 : Land files
+node_3 --> node_4 : Land events
+node_4 --> node_6 : Scan data
+node_6 --> node_7 : Publish trusted data
+node_2 --> node_5 : Register assets
+node_5 --> node_8 : Resolve schema
+node_7 --> node_8 : Read datasets
+node_10 --> node_6 : Apply rules
+node_10 --> node_8 : Authorize query
+node_8 --> node_9 : Return analysis
+@enduml

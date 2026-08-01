@@ -1,0 +1,78 @@
+{
+  "title": "Publish-Subscribe Processing",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "producer",
+      "label": "Event Producer",
+      "type": "service"
+    },
+    {
+      "id": "topic",
+      "label": "Domain Events",
+      "type": "queue"
+    },
+    {
+      "id": "analytics",
+      "label": "Analytics Consumer",
+      "type": "service"
+    },
+    {
+      "id": "billing",
+      "label": "Billing Consumer",
+      "type": "service"
+    },
+    {
+      "id": "notifications",
+      "label": "Notification Consumer",
+      "type": "service"
+    },
+    {
+      "id": "analytics-db",
+      "label": "Analytics Store",
+      "type": "database"
+    },
+    {
+      "id": "audit-log",
+      "label": "Audit Log",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "producer",
+      "to": "topic",
+      "label": "Publish event"
+    },
+    {
+      "from": "topic",
+      "to": "analytics",
+      "label": "Analytics subscription"
+    },
+    {
+      "from": "topic",
+      "to": "billing",
+      "label": "Billing subscription"
+    },
+    {
+      "from": "topic",
+      "to": "notifications",
+      "label": "Notification subscription"
+    },
+    {
+      "from": "analytics",
+      "to": "analytics-db",
+      "label": "Aggregate"
+    },
+    {
+      "from": "billing",
+      "to": "audit-log",
+      "label": "Record charge"
+    },
+    {
+      "from": "notifications",
+      "to": "audit-log",
+      "label": "Record delivery"
+    }
+  ]
+}

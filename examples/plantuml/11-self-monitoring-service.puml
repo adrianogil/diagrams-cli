@@ -1,0 +1,7 @@
+@startuml
+title Self-Monitoring Service
+
+component "Health Checker" as node_1
+
+node_1 --> node_1 : Schedule next check
+@enduml

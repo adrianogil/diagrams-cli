@@ -1,0 +1,25 @@
+@startuml
+title Continuous Delivery Pipeline
+left to right direction
+
+actor "Developer" as node_1
+rectangle "Git Repository" as node_2
+component "CI Runner" as node_3
+component "Test Suite" as node_4
+database "Artifact Registry" as node_5
+queue "Deployment Queue" as node_6
+component "Staging" as node_7
+component "Production" as node_8
+component "Release Monitoring" as node_9
+
+node_1 --> node_2 : Push commit
+node_2 --> node_3 : Trigger build
+node_3 --> node_4 : Run checks
+node_4 --> node_5 : Publish image
+node_5 --> node_6 : Release candidate
+node_6 --> node_7 : Deploy staging
+node_7 --> node_8 : Promote
+node_8 --> node_9 : Emit health
+node_9 --> node_1 : Report regression
+node_9 --> node_6 : Request rollback
+@enduml

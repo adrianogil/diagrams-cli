@@ -1,0 +1,103 @@
+{
+  "title": "IoT Telemetry and Alerts",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "device",
+      "label": "Sensor Device",
+      "type": "actor"
+    },
+    {
+      "id": "gateway",
+      "label": "Edge Gateway",
+      "type": "service"
+    },
+    {
+      "id": "telemetry",
+      "label": "Telemetry Queue",
+      "type": "queue"
+    },
+    {
+      "id": "processor",
+      "label": "Stream Processor",
+      "type": "service"
+    },
+    {
+      "id": "time-series-db",
+      "label": "Time-Series Store",
+      "type": "database"
+    },
+    {
+      "id": "rules",
+      "label": "Rules Engine",
+      "type": "service"
+    },
+    {
+      "id": "alerts",
+      "label": "Alert Queue",
+      "type": "queue"
+    },
+    {
+      "id": "operator",
+      "label": "Operations Engineer",
+      "type": "actor"
+    },
+    {
+      "id": "dashboard",
+      "label": "Telemetry Dashboard",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "device",
+      "to": "gateway",
+      "label": "Send reading"
+    },
+    {
+      "from": "gateway",
+      "to": "telemetry",
+      "label": "Publish telemetry"
+    },
+    {
+      "from": "telemetry",
+      "to": "processor",
+      "label": "Consume stream"
+    },
+    {
+      "from": "processor",
+      "to": "time-series-db",
+      "label": "Store reading"
+    },
+    {
+      "from": "processor",
+      "to": "rules",
+      "label": "Evaluate reading"
+    },
+    {
+      "from": "rules",
+      "to": "alerts",
+      "label": "Raise alert"
+    },
+    {
+      "from": "alerts",
+      "to": "operator",
+      "label": "Notify operator"
+    },
+    {
+      "from": "time-series-db",
+      "to": "dashboard",
+      "label": "Query history"
+    },
+    {
+      "from": "operator",
+      "to": "dashboard",
+      "label": "Investigate"
+    },
+    {
+      "from": "operator",
+      "to": "gateway",
+      "label": "Update configuration"
+    }
+  ]
+}

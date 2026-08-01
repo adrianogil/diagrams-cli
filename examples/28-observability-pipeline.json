@@ -1,0 +1,128 @@
+{
+  "title": "Unified Observability Pipeline",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "applications",
+      "label": "Applications",
+      "type": "service"
+    },
+    {
+      "id": "collector",
+      "label": "Telemetry Collector",
+      "type": "service"
+    },
+    {
+      "id": "logs",
+      "label": "Log Stream",
+      "type": "queue"
+    },
+    {
+      "id": "traces",
+      "label": "Trace Stream",
+      "type": "queue"
+    },
+    {
+      "id": "metrics",
+      "label": "Metric Stream",
+      "type": "queue"
+    },
+    {
+      "id": "log-store",
+      "label": "Log Store",
+      "type": "database"
+    },
+    {
+      "id": "trace-store",
+      "label": "Trace Store",
+      "type": "database"
+    },
+    {
+      "id": "metric-store",
+      "label": "Metric Store",
+      "type": "database"
+    },
+    {
+      "id": "correlator",
+      "label": "Signal Correlator",
+      "type": "generic"
+    },
+    {
+      "id": "alerts",
+      "label": "Alert Manager",
+      "type": "service"
+    },
+    {
+      "id": "sre",
+      "label": "Site Reliability Engineer",
+      "type": "actor"
+    }
+  ],
+  "edges": [
+    {
+      "from": "applications",
+      "to": "collector",
+      "label": "Export telemetry"
+    },
+    {
+      "from": "collector",
+      "to": "logs",
+      "label": "Route logs"
+    },
+    {
+      "from": "collector",
+      "to": "traces",
+      "label": "Route traces"
+    },
+    {
+      "from": "collector",
+      "to": "metrics",
+      "label": "Route metrics"
+    },
+    {
+      "from": "logs",
+      "to": "log-store",
+      "label": "Index logs"
+    },
+    {
+      "from": "traces",
+      "to": "trace-store",
+      "label": "Index spans"
+    },
+    {
+      "from": "metrics",
+      "to": "metric-store",
+      "label": "Store samples"
+    },
+    {
+      "from": "log-store",
+      "to": "correlator",
+      "label": "Search errors"
+    },
+    {
+      "from": "trace-store",
+      "to": "correlator",
+      "label": "Search latency"
+    },
+    {
+      "from": "metric-store",
+      "to": "correlator",
+      "label": "Search anomalies"
+    },
+    {
+      "from": "correlator",
+      "to": "alerts",
+      "label": "Create incident"
+    },
+    {
+      "from": "alerts",
+      "to": "sre",
+      "label": "Page responder"
+    },
+    {
+      "from": "sre",
+      "to": "correlator",
+      "label": "Investigate signals"
+    }
+  ]
+}

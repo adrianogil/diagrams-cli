@@ -1,0 +1,88 @@
+{
+  "title": "Batch and Streaming ETL",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "operational-db",
+      "label": "Operational Database",
+      "type": "database"
+    },
+    {
+      "id": "partner-api",
+      "label": "Partner API",
+      "type": "service"
+    },
+    {
+      "id": "ingestion",
+      "label": "Ingestion Queue",
+      "type": "queue"
+    },
+    {
+      "id": "cleaner",
+      "label": "Data Cleaner",
+      "type": "service"
+    },
+    {
+      "id": "transformer",
+      "label": "Transformer",
+      "type": "service"
+    },
+    {
+      "id": "warehouse",
+      "label": "Data Warehouse",
+      "type": "database"
+    },
+    {
+      "id": "catalog",
+      "label": "Data Catalog",
+      "type": "generic"
+    },
+    {
+      "id": "analyst",
+      "label": "Data Analyst",
+      "type": "actor"
+    }
+  ],
+  "edges": [
+    {
+      "from": "operational-db",
+      "to": "ingestion",
+      "label": "Extract changes"
+    },
+    {
+      "from": "partner-api",
+      "to": "ingestion",
+      "label": "Import records"
+    },
+    {
+      "from": "ingestion",
+      "to": "cleaner",
+      "label": "Raw batches"
+    },
+    {
+      "from": "cleaner",
+      "to": "transformer",
+      "label": "Validated data"
+    },
+    {
+      "from": "transformer",
+      "to": "warehouse",
+      "label": "Load dimensions"
+    },
+    {
+      "from": "transformer",
+      "to": "catalog",
+      "label": "Publish metadata"
+    },
+    {
+      "from": "warehouse",
+      "to": "analyst",
+      "label": "Query datasets"
+    },
+    {
+      "from": "catalog",
+      "to": "analyst",
+      "label": "Discover datasets"
+    }
+  ]
+}

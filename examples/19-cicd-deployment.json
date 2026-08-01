@@ -1,0 +1,103 @@
+{
+  "title": "Continuous Delivery Pipeline",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "developer",
+      "label": "Developer",
+      "type": "actor"
+    },
+    {
+      "id": "repository",
+      "label": "Git Repository",
+      "type": "generic"
+    },
+    {
+      "id": "ci",
+      "label": "CI Runner",
+      "type": "service"
+    },
+    {
+      "id": "tests",
+      "label": "Test Suite",
+      "type": "service"
+    },
+    {
+      "id": "artifacts",
+      "label": "Artifact Registry",
+      "type": "database"
+    },
+    {
+      "id": "deployments",
+      "label": "Deployment Queue",
+      "type": "queue"
+    },
+    {
+      "id": "staging",
+      "label": "Staging",
+      "type": "service"
+    },
+    {
+      "id": "production",
+      "label": "Production",
+      "type": "service"
+    },
+    {
+      "id": "monitoring",
+      "label": "Release Monitoring",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "developer",
+      "to": "repository",
+      "label": "Push commit"
+    },
+    {
+      "from": "repository",
+      "to": "ci",
+      "label": "Trigger build"
+    },
+    {
+      "from": "ci",
+      "to": "tests",
+      "label": "Run checks"
+    },
+    {
+      "from": "tests",
+      "to": "artifacts",
+      "label": "Publish image"
+    },
+    {
+      "from": "artifacts",
+      "to": "deployments",
+      "label": "Release candidate"
+    },
+    {
+      "from": "deployments",
+      "to": "staging",
+      "label": "Deploy staging"
+    },
+    {
+      "from": "staging",
+      "to": "production",
+      "label": "Promote"
+    },
+    {
+      "from": "production",
+      "to": "monitoring",
+      "label": "Emit health"
+    },
+    {
+      "from": "monitoring",
+      "to": "developer",
+      "label": "Report regression"
+    },
+    {
+      "from": "monitoring",
+      "to": "deployments",
+      "label": "Request rollback"
+    }
+  ]
+}

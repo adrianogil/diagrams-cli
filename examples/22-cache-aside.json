@@ -1,0 +1,78 @@
+{
+  "title": "Cache-Aside with Invalidation",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Client",
+      "type": "actor"
+    },
+    {
+      "id": "api",
+      "label": "Product API",
+      "type": "service"
+    },
+    {
+      "id": "cache",
+      "label": "Distributed Cache",
+      "type": "generic"
+    },
+    {
+      "id": "database",
+      "label": "Product Database",
+      "type": "database"
+    },
+    {
+      "id": "invalidations",
+      "label": "Invalidation Events",
+      "type": "queue"
+    },
+    {
+      "id": "cache-worker",
+      "label": "Cache Worker",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client",
+      "to": "api",
+      "label": "Read product"
+    },
+    {
+      "from": "api",
+      "to": "cache",
+      "label": "Lookup key"
+    },
+    {
+      "from": "cache",
+      "to": "api",
+      "label": "Cache hit"
+    },
+    {
+      "from": "api",
+      "to": "database",
+      "label": "Cache miss"
+    },
+    {
+      "from": "database",
+      "to": "api",
+      "label": "Return record"
+    },
+    {
+      "from": "database",
+      "to": "invalidations",
+      "label": "Publish update"
+    },
+    {
+      "from": "invalidations",
+      "to": "cache-worker",
+      "label": "Consume change"
+    },
+    {
+      "from": "cache-worker",
+      "to": "cache",
+      "label": "Evict key"
+    }
+  ]
+}

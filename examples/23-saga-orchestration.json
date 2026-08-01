@@ -1,0 +1,123 @@
+{
+  "title": "Order Saga Orchestration",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "customer",
+      "label": "Customer",
+      "type": "actor"
+    },
+    {
+      "id": "orchestrator",
+      "label": "Saga Orchestrator",
+      "type": "service"
+    },
+    {
+      "id": "orders",
+      "label": "Order Service",
+      "type": "service"
+    },
+    {
+      "id": "inventory",
+      "label": "Inventory Service",
+      "type": "service"
+    },
+    {
+      "id": "payments",
+      "label": "Payment Service",
+      "type": "service"
+    },
+    {
+      "id": "shipping",
+      "label": "Shipping Service",
+      "type": "service"
+    },
+    {
+      "id": "saga-events",
+      "label": "Saga Events",
+      "type": "queue"
+    },
+    {
+      "id": "orders-db",
+      "label": "Orders Database",
+      "type": "database"
+    },
+    {
+      "id": "compensations",
+      "label": "Compensation Queue",
+      "type": "queue"
+    },
+    {
+      "id": "audit",
+      "label": "Saga Audit",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "customer",
+      "to": "orchestrator",
+      "label": "Place order"
+    },
+    {
+      "from": "orchestrator",
+      "to": "orders",
+      "label": "Create order"
+    },
+    {
+      "from": "orders",
+      "to": "orders-db",
+      "label": "Persist pending order"
+    },
+    {
+      "from": "orchestrator",
+      "to": "inventory",
+      "label": "Reserve inventory"
+    },
+    {
+      "from": "orchestrator",
+      "to": "payments",
+      "label": "Authorize payment"
+    },
+    {
+      "from": "orchestrator",
+      "to": "shipping",
+      "label": "Arrange shipment"
+    },
+    {
+      "from": "inventory",
+      "to": "saga-events",
+      "label": "Reservation result"
+    },
+    {
+      "from": "payments",
+      "to": "saga-events",
+      "label": "Payment result"
+    },
+    {
+      "from": "shipping",
+      "to": "saga-events",
+      "label": "Shipment result"
+    },
+    {
+      "from": "saga-events",
+      "to": "orchestrator",
+      "label": "Advance saga"
+    },
+    {
+      "from": "orchestrator",
+      "to": "compensations",
+      "label": "Handle failure"
+    },
+    {
+      "from": "compensations",
+      "to": "inventory",
+      "label": "Release inventory"
+    },
+    {
+      "from": "orchestrator",
+      "to": "audit",
+      "label": "Record transition"
+    }
+  ]
+}

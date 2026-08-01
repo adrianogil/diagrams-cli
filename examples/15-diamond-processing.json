@@ -1,0 +1,58 @@
+{
+  "title": "Diamond Processing Flow",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Client",
+      "type": "actor"
+    },
+    {
+      "id": "router",
+      "label": "Request Router",
+      "type": "service"
+    },
+    {
+      "id": "fast-path",
+      "label": "Fast Path",
+      "type": "service"
+    },
+    {
+      "id": "deep-path",
+      "label": "Deep Analysis",
+      "type": "service"
+    },
+    {
+      "id": "result",
+      "label": "Combined Result",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client",
+      "to": "router",
+      "label": "Submit request"
+    },
+    {
+      "from": "router",
+      "to": "fast-path",
+      "label": "Simple case"
+    },
+    {
+      "from": "router",
+      "to": "deep-path",
+      "label": "Complex case"
+    },
+    {
+      "from": "fast-path",
+      "to": "result",
+      "label": "Fast result"
+    },
+    {
+      "from": "deep-path",
+      "to": "result",
+      "label": "Detailed result"
+    }
+  ]
+}

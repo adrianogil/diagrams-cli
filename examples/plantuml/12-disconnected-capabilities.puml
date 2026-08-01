@@ -1,0 +1,9 @@
+@startuml
+title Disconnected Capabilities
+left to right direction
+
+actor "Operator" as node_1
+component "Scheduler" as node_2
+database "Archive" as node_3
+queue "Pending Jobs" as node_4
+@enduml

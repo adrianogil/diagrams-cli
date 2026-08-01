@@ -140,9 +140,9 @@ The automated suite checks:
 - Both layout directions
 - Disconnected graphs, multi-node cycles, and self-edges
 - Stable IDs, seeds, version values, and timestamps
-- No node overlap across all ten examples
+- No node overlap across all thirty examples
 - CLI stdout and protected file output
-- Byte-for-byte golden output for all ten examples
+- Byte-for-byte golden output for all thirty examples
 
 Run the checks:
 

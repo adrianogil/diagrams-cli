@@ -1,0 +1,133 @@
+{
+  "title": "Zero-Trust Application Access",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "user",
+      "label": "Remote User",
+      "type": "actor"
+    },
+    {
+      "id": "posture",
+      "label": "Device Posture Service",
+      "type": "service"
+    },
+    {
+      "id": "gateway",
+      "label": "Access Gateway",
+      "type": "service"
+    },
+    {
+      "id": "policy",
+      "label": "Policy Engine",
+      "type": "service"
+    },
+    {
+      "id": "identity",
+      "label": "Identity Service",
+      "type": "service"
+    },
+    {
+      "id": "directory",
+      "label": "Identity Directory",
+      "type": "database"
+    },
+    {
+      "id": "tokens",
+      "label": "Token Service",
+      "type": "service"
+    },
+    {
+      "id": "application",
+      "label": "Internal Application",
+      "type": "generic"
+    },
+    {
+      "id": "data",
+      "label": "Protected Data",
+      "type": "database"
+    },
+    {
+      "id": "audit",
+      "label": "Security Audit",
+      "type": "queue"
+    },
+    {
+      "id": "soc",
+      "label": "Security Analyst",
+      "type": "actor"
+    }
+  ],
+  "edges": [
+    {
+      "from": "user",
+      "to": "posture",
+      "label": "Submit device state"
+    },
+    {
+      "from": "user",
+      "to": "gateway",
+      "label": "Request access"
+    },
+    {
+      "from": "gateway",
+      "to": "policy",
+      "label": "Evaluate request"
+    },
+    {
+      "from": "policy",
+      "to": "posture",
+      "label": "Check device"
+    },
+    {
+      "from": "policy",
+      "to": "identity",
+      "label": "Check identity"
+    },
+    {
+      "from": "identity",
+      "to": "directory",
+      "label": "Read attributes"
+    },
+    {
+      "from": "policy",
+      "to": "tokens",
+      "label": "Authorize session"
+    },
+    {
+      "from": "tokens",
+      "to": "gateway",
+      "label": "Issue short token"
+    },
+    {
+      "from": "gateway",
+      "to": "application",
+      "label": "Proxy request"
+    },
+    {
+      "from": "application",
+      "to": "data",
+      "label": "Read protected data"
+    },
+    {
+      "from": "gateway",
+      "to": "audit",
+      "label": "Record decision"
+    },
+    {
+      "from": "policy",
+      "to": "audit",
+      "label": "Record policy result"
+    },
+    {
+      "from": "audit",
+      "to": "soc",
+      "label": "Stream suspicious events"
+    },
+    {
+      "from": "soc",
+      "to": "policy",
+      "label": "Update controls"
+    }
+  ]
+}

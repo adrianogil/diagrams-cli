@@ -1,0 +1,31 @@
+@startuml
+title Zero-Trust Application Access
+left to right direction
+
+actor "Remote User" as node_1
+component "Device Posture Service" as node_2
+component "Access Gateway" as node_3
+component "Policy Engine" as node_4
+component "Identity Service" as node_5
+database "Identity Directory" as node_6
+component "Token Service" as node_7
+rectangle "Internal Application" as node_8
+database "Protected Data" as node_9
+queue "Security Audit" as node_10
+actor "Security Analyst" as node_11
+
+node_1 --> node_2 : Submit device state
+node_1 --> node_3 : Request access
+node_3 --> node_4 : Evaluate request
+node_4 --> node_2 : Check device
+node_4 --> node_5 : Check identity
+node_5 --> node_6 : Read attributes
+node_4 --> node_7 : Authorize session
+node_7 --> node_3 : Issue short token
+node_3 --> node_8 : Proxy request
+node_8 --> node_9 : Read protected data
+node_3 --> node_10 : Record decision
+node_4 --> node_10 : Record policy result
+node_10 --> node_11 : Stream suspicious events
+node_11 --> node_4 : Update controls
+@enduml

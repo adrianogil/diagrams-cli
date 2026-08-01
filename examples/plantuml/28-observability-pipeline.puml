@@ -1,0 +1,29 @@
+@startuml
+title Unified Observability Pipeline
+
+component "Applications" as node_1
+component "Telemetry Collector" as node_2
+queue "Log Stream" as node_3
+queue "Trace Stream" as node_4
+queue "Metric Stream" as node_5
+database "Log Store" as node_6
+database "Trace Store" as node_7
+database "Metric Store" as node_8
+rectangle "Signal Correlator" as node_9
+component "Alert Manager" as node_10
+actor "Site Reliability Engineer" as node_11
+
+node_1 --> node_2 : Export telemetry
+node_2 --> node_3 : Route logs
+node_2 --> node_4 : Route traces
+node_2 --> node_5 : Route metrics
+node_3 --> node_6 : Index logs
+node_4 --> node_7 : Index spans
+node_5 --> node_8 : Store samples
+node_6 --> node_9 : Search errors
+node_7 --> node_9 : Search latency
+node_8 --> node_9 : Search anomalies
+node_9 --> node_10 : Create incident
+node_10 --> node_11 : Page responder
+node_11 --> node_9 : Investigate signals
+@enduml

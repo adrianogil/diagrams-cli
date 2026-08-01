@@ -1,0 +1,16 @@
+@startuml
+title Diamond Processing Flow
+left to right direction
+
+actor "Client" as node_1
+component "Request Router" as node_2
+component "Fast Path" as node_3
+component "Deep Analysis" as node_4
+rectangle "Combined Result" as node_5
+
+node_1 --> node_2 : Submit request
+node_2 --> node_3 : Simple case
+node_2 --> node_4 : Complex case
+node_3 --> node_5 : Fast result
+node_4 --> node_5 : Detailed result
+@enduml

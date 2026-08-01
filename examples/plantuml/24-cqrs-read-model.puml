@@ -1,0 +1,24 @@
+@startuml
+title CQRS Read Model
+left to right direction
+
+actor "User" as node_1
+component "Command API" as node_2
+component "Command Handler" as node_3
+database "Write Database" as node_4
+queue "Domain Events" as node_5
+component "Read Projector" as node_6
+database "Read Database" as node_7
+component "Query API" as node_8
+rectangle "User Dashboard" as node_9
+
+node_1 --> node_2 : Submit command
+node_2 --> node_3 : Validate command
+node_3 --> node_4 : Persist aggregate
+node_3 --> node_5 : Publish event
+node_5 --> node_6 : Consume event
+node_6 --> node_7 : Update projection
+node_1 --> node_8 : Query view
+node_8 --> node_7 : Read projection
+node_8 --> node_9 : Return view
+@enduml

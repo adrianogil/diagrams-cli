@@ -1,0 +1,24 @@
+@startuml
+title IoT Telemetry and Alerts
+
+actor "Sensor Device" as node_1
+component "Edge Gateway" as node_2
+queue "Telemetry Queue" as node_3
+component "Stream Processor" as node_4
+database "Time-Series Store" as node_5
+component "Rules Engine" as node_6
+queue "Alert Queue" as node_7
+actor "Operations Engineer" as node_8
+rectangle "Telemetry Dashboard" as node_9
+
+node_1 --> node_2 : Send reading
+node_2 --> node_3 : Publish telemetry
+node_3 --> node_4 : Consume stream
+node_4 --> node_5 : Store reading
+node_4 --> node_6 : Evaluate reading
+node_6 --> node_7 : Raise alert
+node_7 --> node_8 : Notify operator
+node_5 --> node_9 : Query history
+node_8 --> node_9 : Investigate
+node_8 --> node_2 : Update configuration
+@enduml

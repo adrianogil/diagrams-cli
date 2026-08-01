@@ -1,0 +1,19 @@
+@startuml
+title Cache-Aside with Invalidation
+
+actor "Client" as node_1
+component "Product API" as node_2
+rectangle "Distributed Cache" as node_3
+database "Product Database" as node_4
+queue "Invalidation Events" as node_5
+component "Cache Worker" as node_6
+
+node_1 --> node_2 : Read product
+node_2 --> node_3 : Lookup key
+node_3 --> node_2 : Cache hit
+node_2 --> node_4 : Cache miss
+node_4 --> node_2 : Return record
+node_4 --> node_5 : Publish update
+node_5 --> node_6 : Consume change
+node_6 --> node_3 : Evict key
+@enduml

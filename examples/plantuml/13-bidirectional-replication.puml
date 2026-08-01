@@ -1,0 +1,10 @@
+@startuml
+title Bidirectional Replication
+left to right direction
+
+database "Primary Database" as node_1
+database "Secondary Database" as node_2
+
+node_1 --> node_2 : Replicate changes
+node_2 --> node_1 : Return acknowledgements
+@enduml

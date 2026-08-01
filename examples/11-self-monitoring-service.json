@@ -1,0 +1,18 @@
+{
+  "title": "Self-Monitoring Service",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "health-checker",
+      "label": "Health Checker",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "health-checker",
+      "to": "health-checker",
+      "label": "Schedule next check"
+    }
+  ]
+}

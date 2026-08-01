@@ -1,0 +1,22 @@
+@startuml
+title Batch and Streaming ETL
+left to right direction
+
+database "Operational Database" as node_1
+component "Partner API" as node_2
+queue "Ingestion Queue" as node_3
+component "Data Cleaner" as node_4
+component "Transformer" as node_5
+database "Data Warehouse" as node_6
+rectangle "Data Catalog" as node_7
+actor "Data Analyst" as node_8
+
+node_1 --> node_3 : Extract changes
+node_2 --> node_3 : Import records
+node_3 --> node_4 : Raw batches
+node_4 --> node_5 : Validated data
+node_5 --> node_6 : Load dimensions
+node_5 --> node_7 : Publish metadata
+node_6 --> node_8 : Query datasets
+node_7 --> node_8 : Discover datasets
+@enduml

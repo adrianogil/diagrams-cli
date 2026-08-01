@@ -1,0 +1,230 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagrams-cli",
+  "elements": [
+    {
+      "id": "diagram-title",
+      "type": "text",
+      "x": 100,
+      "y": 50,
+      "width": 354.2,
+      "height": 35.0,
+      "angle": 0,
+      "strokeColor": "#1b1b1f",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": null,
+      "roundness": null,
+      "seed": 1479100676,
+      "version": 1,
+      "versionNonce": 1022439287,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 28,
+      "fontFamily": 1,
+      "text": "Self-Monitoring Service",
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Self-Monitoring Service",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "edge-1",
+      "type": "arrow",
+      "x": 320,
+      "y": 195.0,
+      "width": 80,
+      "height": 30,
+      "angle": 0,
+      "strokeColor": "#495057",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": null,
+      "roundness": {
+        "type": 2
+      },
+      "seed": 942271612,
+      "version": 1,
+      "versionNonce": 415424077,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          30
+        ],
+        [
+          0,
+          30
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": {
+        "elementId": "node-1-shape",
+        "mode": "orbit",
+        "fixedPoint": [
+          1,
+          0.35
+        ]
+      },
+      "endBinding": {
+        "elementId": "node-1-shape",
+        "mode": "orbit",
+        "fixedPoint": [
+          1,
+          0.65
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "node-1-shape",
+      "type": "rectangle",
+      "x": 100,
+      "y": 160,
+      "width": 220,
+      "height": 100,
+      "angle": 0,
+      "strokeColor": "#1b1b1f",
+      "backgroundColor": "#dbe4ff",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": null,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 2099832073,
+      "version": 1,
+      "versionNonce": 1437801724,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "node-1-label",
+          "type": "text"
+        },
+        {
+          "id": "edge-1",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "node-1-label",
+      "type": "text",
+      "x": 133.0,
+      "y": 197.5,
+      "width": 154.0,
+      "height": 25.0,
+      "angle": 0,
+      "strokeColor": "#1b1b1f",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": null,
+      "roundness": null,
+      "seed": 2106452755,
+      "version": 1,
+      "versionNonce": 2067561731,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 20,
+      "fontFamily": 1,
+      "text": "Health Checker",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "node-1-shape",
+      "originalText": "Health Checker",
+      "autoResize": true,
+      "lineHeight": 1.25
+    },
+    {
+      "id": "edge-1-label",
+      "type": "text",
+      "x": 276.4,
+      "y": 184.0,
+      "width": 167.2,
+      "height": 20.0,
+      "angle": 0,
+      "strokeColor": "#495057",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": null,
+      "roundness": null,
+      "seed": 670654032,
+      "version": 1,
+      "versionNonce": 1087983892,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "fontSize": 16,
+      "fontFamily": 1,
+      "text": "Schedule next check",
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": null,
+      "originalText": "Schedule next check",
+      "autoResize": true,
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

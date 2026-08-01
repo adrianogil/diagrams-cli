@@ -140,7 +140,7 @@ node_2 --> node_3 : Read profile
 @enduml
 ```
 
-See [Sample diagrams](samples.md) for all ten inputs and golden outputs.
+See [Sample diagrams](samples.md) for all thirty inputs and golden outputs.
 
 ## Verification
 
@@ -152,7 +152,7 @@ The test suite covers:
 - Escaping and isolation of unsafe source IDs
 - Determinism
 - CLI stdout behavior
-- Byte-for-byte golden output for all ten samples
+- Byte-for-byte golden output for all thirty samples
 
 When a local PlantUML command is available, syntax can be checked with:
 

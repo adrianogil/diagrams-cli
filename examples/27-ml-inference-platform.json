@@ -1,0 +1,123 @@
+{
+  "title": "Machine Learning Inference Platform",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "client",
+      "label": "Prediction Client",
+      "type": "actor"
+    },
+    {
+      "id": "api",
+      "label": "Inference API",
+      "type": "service"
+    },
+    {
+      "id": "features",
+      "label": "Feature Service",
+      "type": "service"
+    },
+    {
+      "id": "feature-store",
+      "label": "Feature Store",
+      "type": "database"
+    },
+    {
+      "id": "model-service",
+      "label": "Model Service",
+      "type": "service"
+    },
+    {
+      "id": "model-registry",
+      "label": "Model Registry",
+      "type": "database"
+    },
+    {
+      "id": "inference-jobs",
+      "label": "Inference Jobs",
+      "type": "queue"
+    },
+    {
+      "id": "gpu-worker",
+      "label": "GPU Worker",
+      "type": "service"
+    },
+    {
+      "id": "results",
+      "label": "Prediction Store",
+      "type": "database"
+    },
+    {
+      "id": "monitor",
+      "label": "Model Monitor",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client",
+      "to": "api",
+      "label": "Request prediction"
+    },
+    {
+      "from": "api",
+      "to": "features",
+      "label": "Resolve features"
+    },
+    {
+      "from": "features",
+      "to": "feature-store",
+      "label": "Read features"
+    },
+    {
+      "from": "api",
+      "to": "model-service",
+      "label": "Select model"
+    },
+    {
+      "from": "model-service",
+      "to": "model-registry",
+      "label": "Load model"
+    },
+    {
+      "from": "api",
+      "to": "inference-jobs",
+      "label": "Queue prediction"
+    },
+    {
+      "from": "inference-jobs",
+      "to": "gpu-worker",
+      "label": "Dispatch job"
+    },
+    {
+      "from": "gpu-worker",
+      "to": "model-service",
+      "label": "Fetch model"
+    },
+    {
+      "from": "gpu-worker",
+      "to": "results",
+      "label": "Store prediction"
+    },
+    {
+      "from": "results",
+      "to": "api",
+      "label": "Return prediction"
+    },
+    {
+      "from": "gpu-worker",
+      "to": "monitor",
+      "label": "Emit inference metrics"
+    },
+    {
+      "from": "feature-store",
+      "to": "monitor",
+      "label": "Emit feature drift"
+    },
+    {
+      "from": "monitor",
+      "to": "model-service",
+      "label": "Request model review"
+    }
+  ]
+}

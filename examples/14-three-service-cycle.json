@@ -1,0 +1,38 @@
+{
+  "title": "Three-Service Coordination Cycle",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "planner",
+      "label": "Planner",
+      "type": "service"
+    },
+    {
+      "id": "executor",
+      "label": "Executor",
+      "type": "service"
+    },
+    {
+      "id": "verifier",
+      "label": "Verifier",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "planner",
+      "to": "executor",
+      "label": "Issue plan"
+    },
+    {
+      "from": "executor",
+      "to": "verifier",
+      "label": "Submit result"
+    },
+    {
+      "from": "verifier",
+      "to": "planner",
+      "label": "Request revision"
+    }
+  ]
+}

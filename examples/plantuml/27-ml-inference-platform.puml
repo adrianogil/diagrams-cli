@@ -1,0 +1,29 @@
+@startuml
+title Machine Learning Inference Platform
+left to right direction
+
+actor "Prediction Client" as node_1
+component "Inference API" as node_2
+component "Feature Service" as node_3
+database "Feature Store" as node_4
+component "Model Service" as node_5
+database "Model Registry" as node_6
+queue "Inference Jobs" as node_7
+component "GPU Worker" as node_8
+database "Prediction Store" as node_9
+rectangle "Model Monitor" as node_10
+
+node_1 --> node_2 : Request prediction
+node_2 --> node_3 : Resolve features
+node_3 --> node_4 : Read features
+node_2 --> node_5 : Select model
+node_5 --> node_6 : Load model
+node_2 --> node_7 : Queue prediction
+node_7 --> node_8 : Dispatch job
+node_8 --> node_5 : Fetch model
+node_8 --> node_9 : Store prediction
+node_9 --> node_2 : Return prediction
+node_8 --> node_10 : Emit inference metrics
+node_4 --> node_10 : Emit feature drift
+node_10 --> node_5 : Request model review
+@enduml

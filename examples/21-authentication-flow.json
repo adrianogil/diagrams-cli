@@ -1,0 +1,98 @@
+{
+  "title": "Federated Authentication Flow",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "browser",
+      "label": "Web Browser",
+      "type": "actor"
+    },
+    {
+      "id": "gateway",
+      "label": "Application Gateway",
+      "type": "service"
+    },
+    {
+      "id": "auth-service",
+      "label": "Authentication Service",
+      "type": "service"
+    },
+    {
+      "id": "identity-provider",
+      "label": "Identity Provider",
+      "type": "generic"
+    },
+    {
+      "id": "token-store",
+      "label": "Token Store",
+      "type": "database"
+    },
+    {
+      "id": "application",
+      "label": "Protected Application",
+      "type": "service"
+    },
+    {
+      "id": "sessions",
+      "label": "Session Database",
+      "type": "database"
+    },
+    {
+      "id": "audit-events",
+      "label": "Authentication Audit",
+      "type": "queue"
+    }
+  ],
+  "edges": [
+    {
+      "from": "browser",
+      "to": "gateway",
+      "label": "Request application"
+    },
+    {
+      "from": "gateway",
+      "to": "auth-service",
+      "label": "Check session"
+    },
+    {
+      "from": "auth-service",
+      "to": "identity-provider",
+      "label": "Redirect login"
+    },
+    {
+      "from": "identity-provider",
+      "to": "auth-service",
+      "label": "Return identity"
+    },
+    {
+      "from": "auth-service",
+      "to": "token-store",
+      "label": "Issue token"
+    },
+    {
+      "from": "auth-service",
+      "to": "sessions",
+      "label": "Create session"
+    },
+    {
+      "from": "auth-service",
+      "to": "audit-events",
+      "label": "Record login"
+    },
+    {
+      "from": "gateway",
+      "to": "application",
+      "label": "Forward authorized request"
+    },
+    {
+      "from": "application",
+      "to": "browser",
+      "label": "Return content"
+    },
+    {
+      "from": "sessions",
+      "to": "gateway",
+      "label": "Validate session"
+    }
+  ]
+}

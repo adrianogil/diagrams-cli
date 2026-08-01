@@ -170,6 +170,8 @@ argument and path checks retain their current CLI behavior.
   part of the initial portable schema.
 - Excalidraw layout does not route arrows or labels around unrelated elements.
 
-Ten progressively complex inputs and golden results from both CLI format paths
-are available in [Sample diagrams](samples.md). Layout and output details are
+Thirty inputs and golden results from both CLI format paths are available in
+[Sample diagrams](samples.md). The original ten form a complexity progression;
+twenty focused scenarios add self-loops, disconnected graphs, cycles, joins,
+feedback paths, and varied application domains. Layout and output details are
 covered in [Excalidraw renderer](excalidraw-renderer.md).

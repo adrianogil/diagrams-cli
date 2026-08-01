@@ -1,0 +1,73 @@
+{
+  "title": "Document Approval Workflow",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "author",
+      "label": "Author",
+      "type": "actor"
+    },
+    {
+      "id": "intake",
+      "label": "Document Intake",
+      "type": "service"
+    },
+    {
+      "id": "reviewer",
+      "label": "Reviewer",
+      "type": "actor"
+    },
+    {
+      "id": "approvals",
+      "label": "Approval Queue",
+      "type": "queue"
+    },
+    {
+      "id": "archive",
+      "label": "Document Archive",
+      "type": "database"
+    },
+    {
+      "id": "notifier",
+      "label": "Notification Service",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "author",
+      "to": "intake",
+      "label": "Submit draft"
+    },
+    {
+      "from": "intake",
+      "to": "approvals",
+      "label": "Queue review"
+    },
+    {
+      "from": "approvals",
+      "to": "reviewer",
+      "label": "Assign review"
+    },
+    {
+      "from": "reviewer",
+      "to": "archive",
+      "label": "Approve"
+    },
+    {
+      "from": "reviewer",
+      "to": "author",
+      "label": "Request changes"
+    },
+    {
+      "from": "archive",
+      "to": "notifier",
+      "label": "Published"
+    },
+    {
+      "from": "notifier",
+      "to": "author",
+      "label": "Send status"
+    }
+  ]
+}

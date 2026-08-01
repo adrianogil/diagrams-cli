@@ -1,0 +1,29 @@
+@startuml
+title Order Saga Orchestration
+left to right direction
+
+actor "Customer" as node_1
+component "Saga Orchestrator" as node_2
+component "Order Service" as node_3
+component "Inventory Service" as node_4
+component "Payment Service" as node_5
+component "Shipping Service" as node_6
+queue "Saga Events" as node_7
+database "Orders Database" as node_8
+queue "Compensation Queue" as node_9
+rectangle "Saga Audit" as node_10
+
+node_1 --> node_2 : Place order
+node_2 --> node_3 : Create order
+node_3 --> node_8 : Persist pending order
+node_2 --> node_4 : Reserve inventory
+node_2 --> node_5 : Authorize payment
+node_2 --> node_6 : Arrange shipment
+node_4 --> node_7 : Reservation result
+node_5 --> node_7 : Payment result
+node_6 --> node_7 : Shipment result
+node_7 --> node_2 : Advance saga
+node_2 --> node_9 : Handle failure
+node_9 --> node_4 : Release inventory
+node_2 --> node_10 : Record transition
+@enduml

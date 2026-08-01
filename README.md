@@ -15,7 +15,7 @@ See the detailed documentation:
 - [Excalidraw renderer and layout](docs/excalidraw-renderer.md)
 - [Output files and overwrite protection](docs/output-files.md)
 - [Implementation plan](docs/implementation-plan.md)
-- [Ten progressively complex samples](docs/samples.md)
+- [Thirty sample diagrams and golden outputs](docs/samples.md)
 - [Testing, golden fixtures, and installed CLI coverage](docs/testing.md)
 
 ## Installation

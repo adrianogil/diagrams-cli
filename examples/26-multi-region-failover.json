@@ -1,0 +1,123 @@
+{
+  "title": "Multi-Region Failover",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "user",
+      "label": "Global User",
+      "type": "actor"
+    },
+    {
+      "id": "dns",
+      "label": "Global Traffic Manager",
+      "type": "generic"
+    },
+    {
+      "id": "gateway-a",
+      "label": "Region A Gateway",
+      "type": "service"
+    },
+    {
+      "id": "gateway-b",
+      "label": "Region B Gateway",
+      "type": "service"
+    },
+    {
+      "id": "service-a",
+      "label": "Region A Service",
+      "type": "service"
+    },
+    {
+      "id": "service-b",
+      "label": "Region B Service",
+      "type": "service"
+    },
+    {
+      "id": "database-a",
+      "label": "Region A Database",
+      "type": "database"
+    },
+    {
+      "id": "database-b",
+      "label": "Region B Database",
+      "type": "database"
+    },
+    {
+      "id": "replication",
+      "label": "Replication Stream",
+      "type": "queue"
+    },
+    {
+      "id": "health",
+      "label": "Global Health Service",
+      "type": "service"
+    }
+  ],
+  "edges": [
+    {
+      "from": "user",
+      "to": "dns",
+      "label": "Resolve endpoint"
+    },
+    {
+      "from": "dns",
+      "to": "gateway-a",
+      "label": "Primary route"
+    },
+    {
+      "from": "dns",
+      "to": "gateway-b",
+      "label": "Failover route"
+    },
+    {
+      "from": "gateway-a",
+      "to": "service-a",
+      "label": "Forward request"
+    },
+    {
+      "from": "gateway-b",
+      "to": "service-b",
+      "label": "Forward request"
+    },
+    {
+      "from": "service-a",
+      "to": "database-a",
+      "label": "Read and write"
+    },
+    {
+      "from": "service-b",
+      "to": "database-b",
+      "label": "Read and write"
+    },
+    {
+      "from": "database-a",
+      "to": "replication",
+      "label": "Publish changes"
+    },
+    {
+      "from": "replication",
+      "to": "database-b",
+      "label": "Apply changes"
+    },
+    {
+      "from": "database-b",
+      "to": "replication",
+      "label": "Publish recovery changes"
+    },
+    {
+      "from": "health",
+      "to": "gateway-a",
+      "label": "Probe region"
+    },
+    {
+      "from": "health",
+      "to": "gateway-b",
+      "label": "Probe region"
+    },
+    {
+      "from": "health",
+      "to": "dns",
+      "label": "Update routing"
+    }
+  ]
+}

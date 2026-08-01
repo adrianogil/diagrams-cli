@@ -1,0 +1,11 @@
+@startuml
+title Three-Service Coordination Cycle
+
+component "Planner" as node_1
+component "Executor" as node_2
+component "Verifier" as node_3
+
+node_1 --> node_2 : Issue plan
+node_2 --> node_3 : Submit result
+node_3 --> node_1 : Request revision
+@enduml

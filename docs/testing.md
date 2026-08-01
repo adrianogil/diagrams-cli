@@ -21,7 +21,7 @@ or differences at the process boundary.
 
 ## Golden fixture inventory
 
-The same ten progressive JSON inputs drive both renderer fixture sets:
+The same thirty JSON inputs drive both renderer fixture sets:
 
 ```text
 examples/*.json
@@ -29,9 +29,11 @@ examples/plantuml/*.puml
 examples/excalidraw/*.excalidraw
 ```
 
-There are ten PlantUML and ten Excalidraw golden files. A golden is the exact
-UTF-8 output expected for its input, including whitespace and the final
-newline. This makes determinism regressions visible in code review.
+There are thirty PlantUML and thirty Excalidraw golden files. The original ten
+inputs increase progressively in size; the next twenty target distinct graph
+structures and application domains. A golden is the exact UTF-8 output
+expected for its input, including whitespace and the final newline. This makes
+determinism regressions visible in code review.
 
 `tests/test_examples.py` verifies the renderers directly. It also checks the
 Excalidraw document structure and confirms that node rectangles do not overlap
@@ -51,8 +53,8 @@ The subprocess coverage verifies:
 
 | Boundary | Coverage |
 | --- | --- |
-| Installed `diagrams-cli` | All ten PlantUML stdout goldens |
-| Installed `python -m diagrams_cli` | All ten Excalidraw stdout goldens |
+| Installed `diagrams-cli` | All thirty PlantUML stdout goldens |
+| Installed `python -m diagrams_cli` | All thirty Excalidraw stdout goldens |
 | Both installed entry points | Help, version, and format-specific file output |
 | Installed console script | Existing-file refusal and explicit `--force` replacement |
 | Installed module | Invalid JSON and invalid output-extension failures |

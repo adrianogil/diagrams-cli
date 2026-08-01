@@ -1,0 +1,32 @@
+@startuml
+title Smart City Operations Platform
+
+actor "City Sensors" as node_1
+component "Edge Gateway" as node_2
+queue "City Event Stream" as node_3
+component "Traffic Service" as node_4
+component "Transit Service" as node_5
+component "Energy Service" as node_6
+database "Traffic Database" as node_7
+database "Transit Database" as node_8
+database "Energy Database" as node_9
+rectangle "City Operations Dashboard" as node_10
+actor "Emergency Operator" as node_11
+queue "Emergency Alerts" as node_12
+
+node_1 --> node_2 : Send observations
+node_2 --> node_3 : Publish city events
+node_3 --> node_4 : Traffic events
+node_3 --> node_5 : Transit events
+node_3 --> node_6 : Energy events
+node_4 --> node_7 : Store traffic state
+node_5 --> node_8 : Store transit state
+node_6 --> node_9 : Store grid state
+node_7 --> node_10 : Display congestion
+node_8 --> node_10 : Display arrivals
+node_9 --> node_10 : Display demand
+node_4 --> node_12 : Report incident
+node_6 --> node_12 : Report outage
+node_12 --> node_11 : Notify operator
+node_11 --> node_10 : Coordinate response
+@enduml

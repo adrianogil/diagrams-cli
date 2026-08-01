@@ -1,0 +1,27 @@
+{
+  "title": "Disconnected Capabilities",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "operator",
+      "label": "Operator",
+      "type": "actor"
+    },
+    {
+      "id": "scheduler",
+      "label": "Scheduler",
+      "type": "service"
+    },
+    {
+      "id": "archive",
+      "label": "Archive",
+      "type": "database"
+    },
+    {
+      "id": "pending-jobs",
+      "label": "Pending Jobs",
+      "type": "queue"
+    }
+  ],
+  "edges": []
+}

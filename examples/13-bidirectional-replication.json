@@ -1,0 +1,28 @@
+{
+  "title": "Bidirectional Replication",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "primary",
+      "label": "Primary Database",
+      "type": "database"
+    },
+    {
+      "id": "secondary",
+      "label": "Secondary Database",
+      "type": "database"
+    }
+  ],
+  "edges": [
+    {
+      "from": "primary",
+      "to": "secondary",
+      "label": "Replicate changes"
+    },
+    {
+      "from": "secondary",
+      "to": "primary",
+      "label": "Return acknowledgements"
+    }
+  ]
+}

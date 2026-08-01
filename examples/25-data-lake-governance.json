@@ -1,0 +1,118 @@
+{
+  "title": "Governed Data Lake",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "source-owner",
+      "label": "Source Owner",
+      "type": "actor"
+    },
+    {
+      "id": "batch-ingest",
+      "label": "Batch Ingestion",
+      "type": "service"
+    },
+    {
+      "id": "stream-ingest",
+      "label": "Streaming Ingestion",
+      "type": "queue"
+    },
+    {
+      "id": "raw-zone",
+      "label": "Raw Data Zone",
+      "type": "database"
+    },
+    {
+      "id": "catalog",
+      "label": "Metadata Catalog",
+      "type": "generic"
+    },
+    {
+      "id": "quality",
+      "label": "Quality Service",
+      "type": "service"
+    },
+    {
+      "id": "curated-zone",
+      "label": "Curated Data Zone",
+      "type": "database"
+    },
+    {
+      "id": "query-engine",
+      "label": "Query Engine",
+      "type": "service"
+    },
+    {
+      "id": "scientist",
+      "label": "Data Scientist",
+      "type": "actor"
+    },
+    {
+      "id": "governance",
+      "label": "Governance Policies",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "source-owner",
+      "to": "batch-ingest",
+      "label": "Upload batch"
+    },
+    {
+      "from": "source-owner",
+      "to": "stream-ingest",
+      "label": "Publish stream"
+    },
+    {
+      "from": "batch-ingest",
+      "to": "raw-zone",
+      "label": "Land files"
+    },
+    {
+      "from": "stream-ingest",
+      "to": "raw-zone",
+      "label": "Land events"
+    },
+    {
+      "from": "raw-zone",
+      "to": "quality",
+      "label": "Scan data"
+    },
+    {
+      "from": "quality",
+      "to": "curated-zone",
+      "label": "Publish trusted data"
+    },
+    {
+      "from": "batch-ingest",
+      "to": "catalog",
+      "label": "Register assets"
+    },
+    {
+      "from": "catalog",
+      "to": "query-engine",
+      "label": "Resolve schema"
+    },
+    {
+      "from": "curated-zone",
+      "to": "query-engine",
+      "label": "Read datasets"
+    },
+    {
+      "from": "governance",
+      "to": "quality",
+      "label": "Apply rules"
+    },
+    {
+      "from": "governance",
+      "to": "query-engine",
+      "label": "Authorize query"
+    },
+    {
+      "from": "query-engine",
+      "to": "scientist",
+      "label": "Return analysis"
+    }
+  ]
+}

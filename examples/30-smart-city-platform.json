@@ -1,0 +1,143 @@
+{
+  "title": "Smart City Operations Platform",
+  "direction": "top-to-bottom",
+  "nodes": [
+    {
+      "id": "sensors",
+      "label": "City Sensors",
+      "type": "actor"
+    },
+    {
+      "id": "edge-gateway",
+      "label": "Edge Gateway",
+      "type": "service"
+    },
+    {
+      "id": "ingestion",
+      "label": "City Event Stream",
+      "type": "queue"
+    },
+    {
+      "id": "traffic",
+      "label": "Traffic Service",
+      "type": "service"
+    },
+    {
+      "id": "transit",
+      "label": "Transit Service",
+      "type": "service"
+    },
+    {
+      "id": "energy",
+      "label": "Energy Service",
+      "type": "service"
+    },
+    {
+      "id": "traffic-db",
+      "label": "Traffic Database",
+      "type": "database"
+    },
+    {
+      "id": "transit-db",
+      "label": "Transit Database",
+      "type": "database"
+    },
+    {
+      "id": "energy-db",
+      "label": "Energy Database",
+      "type": "database"
+    },
+    {
+      "id": "dashboard",
+      "label": "City Operations Dashboard",
+      "type": "generic"
+    },
+    {
+      "id": "emergency-operator",
+      "label": "Emergency Operator",
+      "type": "actor"
+    },
+    {
+      "id": "alerts",
+      "label": "Emergency Alerts",
+      "type": "queue"
+    }
+  ],
+  "edges": [
+    {
+      "from": "sensors",
+      "to": "edge-gateway",
+      "label": "Send observations"
+    },
+    {
+      "from": "edge-gateway",
+      "to": "ingestion",
+      "label": "Publish city events"
+    },
+    {
+      "from": "ingestion",
+      "to": "traffic",
+      "label": "Traffic events"
+    },
+    {
+      "from": "ingestion",
+      "to": "transit",
+      "label": "Transit events"
+    },
+    {
+      "from": "ingestion",
+      "to": "energy",
+      "label": "Energy events"
+    },
+    {
+      "from": "traffic",
+      "to": "traffic-db",
+      "label": "Store traffic state"
+    },
+    {
+      "from": "transit",
+      "to": "transit-db",
+      "label": "Store transit state"
+    },
+    {
+      "from": "energy",
+      "to": "energy-db",
+      "label": "Store grid state"
+    },
+    {
+      "from": "traffic-db",
+      "to": "dashboard",
+      "label": "Display congestion"
+    },
+    {
+      "from": "transit-db",
+      "to": "dashboard",
+      "label": "Display arrivals"
+    },
+    {
+      "from": "energy-db",
+      "to": "dashboard",
+      "label": "Display demand"
+    },
+    {
+      "from": "traffic",
+      "to": "alerts",
+      "label": "Report incident"
+    },
+    {
+      "from": "energy",
+      "to": "alerts",
+      "label": "Report outage"
+    },
+    {
+      "from": "alerts",
+      "to": "emergency-operator",
+      "label": "Notify operator"
+    },
+    {
+      "from": "emergency-operator",
+      "to": "dashboard",
+      "label": "Coordinate response"
+    }
+  ]
+}

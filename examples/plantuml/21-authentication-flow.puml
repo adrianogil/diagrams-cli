@@ -1,0 +1,24 @@
+@startuml
+title Federated Authentication Flow
+left to right direction
+
+actor "Web Browser" as node_1
+component "Application Gateway" as node_2
+component "Authentication Service" as node_3
+rectangle "Identity Provider" as node_4
+database "Token Store" as node_5
+component "Protected Application" as node_6
+database "Session Database" as node_7
+queue "Authentication Audit" as node_8
+
+node_1 --> node_2 : Request application
+node_2 --> node_3 : Check session
+node_3 --> node_4 : Redirect login
+node_4 --> node_3 : Return identity
+node_3 --> node_5 : Issue token
+node_3 --> node_7 : Create session
+node_3 --> node_8 : Record login
+node_2 --> node_6 : Forward authorized request
+node_6 --> node_1 : Return content
+node_7 --> node_2 : Validate session
+@enduml

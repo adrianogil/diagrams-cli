@@ -1,0 +1,98 @@
+{
+  "title": "CQRS Read Model",
+  "direction": "left-to-right",
+  "nodes": [
+    {
+      "id": "user",
+      "label": "User",
+      "type": "actor"
+    },
+    {
+      "id": "command-api",
+      "label": "Command API",
+      "type": "service"
+    },
+    {
+      "id": "command-handler",
+      "label": "Command Handler",
+      "type": "service"
+    },
+    {
+      "id": "write-db",
+      "label": "Write Database",
+      "type": "database"
+    },
+    {
+      "id": "events",
+      "label": "Domain Events",
+      "type": "queue"
+    },
+    {
+      "id": "projector",
+      "label": "Read Projector",
+      "type": "service"
+    },
+    {
+      "id": "read-db",
+      "label": "Read Database",
+      "type": "database"
+    },
+    {
+      "id": "query-api",
+      "label": "Query API",
+      "type": "service"
+    },
+    {
+      "id": "view",
+      "label": "User Dashboard",
+      "type": "generic"
+    }
+  ],
+  "edges": [
+    {
+      "from": "user",
+      "to": "command-api",
+      "label": "Submit command"
+    },
+    {
+      "from": "command-api",
+      "to": "command-handler",
+      "label": "Validate command"
+    },
+    {
+      "from": "command-handler",
+      "to": "write-db",
+      "label": "Persist aggregate"
+    },
+    {
+      "from": "command-handler",
+      "to": "events",
+      "label": "Publish event"
+    },
+    {
+      "from": "events",
+      "to": "projector",
+      "label": "Consume event"
+    },
+    {
+      "from": "projector",
+      "to": "read-db",
+      "label": "Update projection"
+    },
+    {
+      "from": "user",
+      "to": "query-api",
+      "label": "Query view"
+    },
+    {
+      "from": "query-api",
+      "to": "read-db",
+      "label": "Read projection"
+    },
+    {
+      "from": "query-api",
+      "to": "view",
+      "label": "Return view"
+    }
+  ]
+}
