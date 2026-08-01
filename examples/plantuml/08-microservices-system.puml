@@ -1,0 +1,25 @@
+@startuml
+title Storefront Microservices
+left to right direction
+
+actor "Shopper" as node_1
+component "Web Storefront" as node_2
+component "API Gateway" as node_3
+component "Identity Service" as node_4
+component "Catalog Service" as node_5
+component "Orders Service" as node_6
+database "Identity Database" as node_7
+database "Catalog Database" as node_8
+database "Orders Database" as node_9
+
+node_1 --> node_2 : Browse store
+node_2 --> node_3 : API calls
+node_3 --> node_4 : Authenticate
+node_3 --> node_5 : Browse catalog
+node_3 --> node_6 : Manage orders
+node_4 --> node_7 : Read identity
+node_5 --> node_8 : Read products
+node_6 --> node_9 : Persist order
+node_6 --> node_5 : Check product
+node_6 --> node_4 : Check customer
+@enduml

@@ -2,16 +2,15 @@
 
 ## Current status
 
-`diagrams-cli` currently implements the input half of the generation
-pipeline:
+`diagrams-cli` implements the validated input pipeline and PlantUML output:
 
 ```text
 UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
+                                                        |-> PlantUML stdout
+                                                        `-> Excalidraw placeholder
 ```
 
-The CLI performs this pipeline before printing its explicit placeholder
-message. PlantUML and Excalidraw renderers are planned but are not yet
-implemented.
+The Excalidraw renderer remains planned work.
 
 ## Package responsibilities
 
@@ -22,8 +21,11 @@ implemented.
 - `diagrams_cli.loader` reads UTF-8 JSON files or JSON strings and delegates
   schema validation.
 - `diagrams_cli.errors` provides the expected input-error hierarchy.
+- `diagrams_cli.renderers` defines the common callable renderer interface.
+- `diagrams_cli.renderers.plantuml` produces deterministic PlantUML source.
 - `diagrams_cli.cli` handles CLI arguments and reports loading or validation
-  failures without a traceback.
+  failures without a traceback, renders PlantUML to stdout, and retains an
+  explicit Excalidraw placeholder.
 
 Keeping the input model independent from output formats allows PlantUML and
 Excalidraw renderers to consume the same validated diagram.
@@ -156,10 +158,11 @@ argument and path checks retain their current CLI behavior.
 
 ## Current limitations
 
-- No PlantUML or Excalidraw content is generated yet.
+- Excalidraw content is not generated yet.
 - No output-file option exists yet.
 - Input is file-only at the CLI layer; `loads_diagram` already supports the
   future stdin path.
+- PlantUML source is written to stdout; image rendering is not invoked.
 - Styling, groups, node coordinates, and renderer-specific options are not
   part of the initial portable schema.
 

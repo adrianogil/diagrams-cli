@@ -26,25 +26,29 @@ input -> decode -> validate -> diagram model -> optional layout -> renderer -> o
 - [x] Add ten progressively complex validated examples.
 - [x] Record CLI results for both format selections.
 
-Acceptance result: valid JSON reaches the existing explicit placeholder;
-invalid JSON or schema input produces a concise error without a traceback.
+Acceptance result: valid JSON reaches renderer selection; invalid JSON or
+schema input produces a concise error without a traceback.
 
-## Phase 2: PlantUML renderer
+## Phase 2: PlantUML renderer — complete
 
-- [ ] Add a renderer protocol or common renderer interface.
-- [ ] Map portable node types to PlantUML constructs.
-- [ ] Render title and direction.
-- [ ] Render directed, optionally labeled edges.
-- [ ] Escape labels and identifiers safely.
-- [ ] Keep output order deterministic.
-- [ ] Add unit tests and golden `.puml` fixtures.
-- [ ] Replace the PlantUML placeholder path with generated text.
+- [x] Add a renderer protocol or common renderer interface.
+- [x] Map portable node types to PlantUML constructs.
+- [x] Render title and direction.
+- [x] Render directed, optionally labeled edges.
+- [x] Escape labels and identifiers safely.
+- [x] Keep output order deterministic.
+- [x] Add unit tests and golden `.puml` fixtures.
+- [x] Replace the PlantUML placeholder path with generated text.
 
 Acceptance criteria:
 
 - A documented example produces syntactically valid PlantUML.
 - Labels cannot inject unintended PlantUML statements.
 - Repeated runs with the same input produce byte-identical output.
+
+Acceptance result: all ten example inputs produce byte-stable golden PlantUML
+files, the CLI writes generated source to stdout, unsafe source IDs never
+become aliases, and every golden file passes local PlantUML syntax checking.
 
 ## Phase 3: Output handling and CLI conventions
 

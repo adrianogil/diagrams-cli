@@ -1,0 +1,9 @@
+@startuml
+title Client and API
+left to right direction
+
+actor "Web Client" as node_1
+component "Public API" as node_2
+
+node_1 --> node_2 : HTTPS request
+@enduml

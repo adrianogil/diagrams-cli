@@ -1,0 +1,31 @@
+@startuml
+title Resilient Processing with Observability
+
+component "Event Producer" as node_1
+queue "Event Queue" as node_2
+component "Event Processor" as node_3
+database "Primary Database" as node_4
+queue "Retry Queue" as node_5
+queue "Dead Letter Queue" as node_6
+component "Metrics Collector" as node_7
+component "Alert Manager" as node_8
+actor "On-Call Operator" as node_9
+rectangle "Operations Dashboard" as node_10
+component "Replay Tool" as node_11
+
+node_1 --> node_2 : Publish event
+node_2 --> node_3 : Consume event
+node_3 --> node_4 : Persist result
+node_3 --> node_5 : Temporary failure
+node_5 --> node_3 : Retry
+node_3 --> node_6 : Permanent failure
+node_3 --> node_7 : Emit metrics
+node_2 --> node_7 : Queue depth
+node_7 --> node_8 : Threshold exceeded
+node_7 --> node_10 : Display health
+node_8 --> node_9 : Page operator
+node_9 --> node_10 : Investigate
+node_9 --> node_11 : Start replay
+node_6 --> node_11 : Load failed events
+node_11 --> node_2 : Republish event
+@enduml

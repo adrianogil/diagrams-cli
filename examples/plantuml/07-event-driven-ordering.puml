@@ -1,0 +1,18 @@
+@startuml
+title Event-Driven Ordering
+left to right direction
+
+actor "Customer" as node_1
+component "Orders API" as node_2
+database "Orders Database" as node_3
+queue "Order Events" as node_4
+component "Fulfillment Worker" as node_5
+rectangle "Warehouse System" as node_6
+
+node_1 --> node_2 : Place order
+node_2 --> node_3 : Store order
+node_2 --> node_4 : Publish OrderCreated
+node_4 --> node_5 : Consume event
+node_5 --> node_6 : Reserve stock
+node_5 --> node_3 : Update status
+@enduml

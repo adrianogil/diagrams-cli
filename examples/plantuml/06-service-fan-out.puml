@@ -1,0 +1,16 @@
+@startuml
+title Dashboard Aggregation
+left to right direction
+
+actor "Dashboard" as node_1
+component "API Gateway" as node_2
+component "Sales Service" as node_3
+component "Inventory Service" as node_4
+rectangle "Aggregated View" as node_5
+
+node_1 --> node_2 : Load dashboard
+node_2 --> node_3 : Fetch sales
+node_2 --> node_4 : Fetch inventory
+node_3 --> node_5 : Sales data
+node_4 --> node_5 : Inventory data
+@enduml

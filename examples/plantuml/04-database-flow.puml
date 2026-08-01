@@ -1,0 +1,11 @@
+@startuml
+title Profile Lookup
+left to right direction
+
+actor "User" as node_1
+component "Profile API" as node_2
+database "Profile Database" as node_3
+
+node_1 --> node_2 : Request profile
+node_2 --> node_3 : Read profile
+@enduml

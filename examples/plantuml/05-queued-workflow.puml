@@ -1,0 +1,12 @@
+@startuml
+title Queued Report Generation
+
+actor "Operator" as node_1
+component "Report API" as node_2
+queue "Report Queue" as node_3
+component "Report Worker" as node_4
+
+node_1 --> node_2 : Submit report
+node_2 --> node_3 : Enqueue job
+node_3 --> node_4 : Consume job
+@enduml

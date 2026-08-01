@@ -1,0 +1,5 @@
+@startuml
+title Single Component
+
+rectangle "Standalone Component" as node_1
+@enduml

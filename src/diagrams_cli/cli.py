@@ -9,6 +9,7 @@ from pathlib import Path
 from diagrams_cli import __version__
 from diagrams_cli.errors import DiagramError
 from diagrams_cli.loader import load_diagram
+from diagrams_cli.renderers import render_plantuml
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -30,7 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--format",
         choices=["plantuml", "excalidraw"],
         default="plantuml",
-        help="Output format to generate.",
+        help="Output format; Excalidraw is currently a placeholder.",
     )
     return parser
 
@@ -50,10 +51,14 @@ def main(argv: list[str] | None = None) -> int:
         parser.error(f"input path is not a file: {args.input}")
 
     try:
-        load_diagram(source_path)
+        diagram = load_diagram(source_path)
     except DiagramError as error:
         print(f"diagrams-cli: error: {error}", file=sys.stderr)
         return 1
+
+    if args.format == "plantuml":
+        print(render_plantuml(diagram), end="", file=sys.stdout)
+        return 0
 
     print(
         "Placeholder: would generate",

@@ -42,7 +42,7 @@ class BuildParserTests(unittest.TestCase):
 
 
 class MainTests(unittest.TestCase):
-    def test_valid_arguments_report_input_and_output_format(self) -> None:
+    def test_excalidraw_arguments_report_placeholder(self) -> None:
         stdout = io.StringIO()
 
         with tempfile.TemporaryDirectory() as directory:
@@ -58,6 +58,39 @@ class MainTests(unittest.TestCase):
         self.assertEqual(
             stdout.getvalue(),
             f"Placeholder: would generate excalidraw from {source}\n",
+        )
+
+    def test_plantuml_arguments_render_to_stdout(self) -> None:
+        stdout = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.write_text(
+                """
+                {
+                  "nodes": [
+                    {"id": "user", "label": "User", "type": "actor"},
+                    {"id": "api", "label": "API", "type": "service"}
+                  ],
+                  "edges": [{"from": "user", "to": "api"}]
+                }
+                """,
+                encoding="utf-8",
+            )
+
+            with contextlib.redirect_stdout(stdout):
+                exit_code = main([str(source)])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(
+            stdout.getvalue(),
+            """@startuml
+actor "User" as node_1
+component "API" as node_2
+
+node_1 --> node_2
+@enduml
+""",
         )
 
     def test_missing_source_reports_cli_error(self) -> None:

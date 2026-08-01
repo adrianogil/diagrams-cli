@@ -1,0 +1,43 @@
+@startuml
+title Commerce Platform
+left to right direction
+
+actor "Customer" as node_1
+actor "Support Agent" as node_2
+component "Web Application" as node_3
+component "API Gateway" as node_4
+component "Identity Service" as node_5
+component "Catalog Service" as node_6
+component "Order Service" as node_7
+component "Payment Service" as node_8
+component "Notification Service" as node_9
+component "Fulfillment Worker" as node_10
+database "Identity Database" as node_11
+database "Catalog Database" as node_12
+database "Orders Database" as node_13
+queue "Order Event Bus" as node_14
+rectangle "Audit Log" as node_15
+
+node_1 --> node_3 : Shop
+node_2 --> node_3 : Assist customer
+node_3 --> node_4 : API requests
+node_4 --> node_5 : Authenticate
+node_4 --> node_6 : Browse catalog
+node_4 --> node_7 : Manage order
+node_5 --> node_11 : Read identity
+node_6 --> node_12 : Read inventory
+node_7 --> node_5 : Verify customer
+node_7 --> node_6 : Reserve inventory
+node_7 --> node_8 : Authorize payment
+node_7 --> node_13 : Persist order
+node_7 --> node_14 : Publish OrderCreated
+node_8 --> node_14 : Publish PaymentAuthorized
+node_14 --> node_9 : Notify customer
+node_14 --> node_10 : Start fulfillment
+node_10 --> node_6 : Commit inventory
+node_10 --> node_13 : Update fulfillment
+node_5 --> node_15 : Record access
+node_8 --> node_15 : Record payment
+node_7 --> node_15 : Record order
+node_9 --> node_1 : Send confirmation
+@enduml
