@@ -3,7 +3,7 @@
 ## Goal
 
 Turn `diagrams-cli` into a deterministic converter from one validated JSON
-diagram format to PlantUML and Excalidraw outputs.
+diagram format to PlantUML, Excalidraw, and Mermaid outputs.
 
 The intended pipeline is:
 
@@ -25,7 +25,7 @@ input -> decode -> validate -> diagram model -> optional layout -> renderer -> o
 - [x] Document the schema, API, errors, and current limitations.
 - [x] Add ten progressively complex validated examples.
 - [x] Add twenty focused scenarios covering additional graph structures.
-- [x] Record CLI results for both format selections.
+- [x] Record CLI results for all supported format selections.
 
 Acceptance result: valid JSON reaches renderer selection; invalid JSON or
 schema input produces a concise error without a traceback. Thirty distinct
@@ -57,7 +57,8 @@ become aliases, and every golden file passes local PlantUML syntax checking.
 
 - [x] Add `--output/-o` with stdout as the default.
 - [ ] Support `-` for stdin and stdout.
-- [x] Validate `.puml` and `.excalidraw` extensions when a path is supplied.
+- [x] Validate `.puml`, `.excalidraw`, and `.mmd` extensions when a path is
+      supplied.
 - [x] Refuse to overwrite existing files unless `--force` is present.
 - [x] Report filesystem errors without tracebacks.
 - [ ] Make the positional input argument required through `argparse` or
@@ -71,7 +72,7 @@ Acceptance criteria:
 - Existing user files are never overwritten implicitly.
 - Help text documents defaults and output rules.
 
-Progress result: both renderers support stdout and protected format-specific
+Progress result: all three renderers support stdout and protected format-specific
 files, extensions are format-aware, exclusive creation prevents overwrite
 races, and `--force` explicitly enables replacement. Explicit `-` streams and
 broader CLI convention cleanup remain open.
@@ -100,7 +101,22 @@ and editable text. Strongly connected components make cycles finite and
 predictable, disconnected nodes retain input order, and the CLI supports both
 stdout and protected `.excalidraw` files.
 
-## Phase 5: Packaging, automation, and documentation
+## Phase 5: Mermaid renderer — complete
+
+- [x] Map portable directions and node types to Mermaid flowchart syntax.
+- [x] Render diagram titles and labeled directed edges.
+- [x] Isolate user IDs behind deterministic aliases.
+- [x] Escape label content that could alter Mermaid syntax.
+- [x] Add `--format mermaid` and protected `.mmd` output.
+- [x] Add renderer, CLI, output, and installed-command tests.
+- [x] Document Mermaid usage, mappings, determinism, and limitations.
+
+Acceptance result: validated JSON produces deterministic Mermaid flowchart
+text on stdout or in protected `.mmd` files. Every portable node type and both
+directions are supported, unsafe IDs are never emitted, and labels cannot add
+unintended Mermaid statements.
+
+## Phase 6: Packaging, automation, and documentation
 
 - [x] Add installed-command tests for `diagrams-cli` and
       `python -m diagrams_cli`.
@@ -116,7 +132,7 @@ stdout and protected `.excalidraw` files.
 Acceptance criteria:
 
 - CI verifies tests, compilation, builds, and installed entry points.
-- A new user can install the package and generate both formats from the
+- A new user can install the package and generate all three formats from the
   documented example.
 
 Progress result: the test suite builds a wheel without network-dependent build
@@ -130,14 +146,14 @@ schema-evolution documentation remain open.
 
 ## Deferred extensions
 
-These should be considered only after both core renderers are stable:
+These should be considered only after the core renderers are stable:
 
 - Groups or containers
 - Explicit positioning hints
 - Styles and themes
 - Additional edge types
 - JSON Schema publication
-- Additional output formats
+- Additional output formats beyond PlantUML, Excalidraw, and Mermaid
 - Watch mode or batch conversion
 
 Portable concepts should remain in the common model. Renderer-specific

@@ -20,6 +20,10 @@ class ValidateOutputPathTests(unittest.TestCase):
             validate_output_path("diagram.EXCALIDRAW", "excalidraw"),
             Path("diagram.EXCALIDRAW"),
         )
+        self.assertEqual(
+            validate_output_path("diagram.MMD", "mermaid"),
+            Path("diagram.MMD"),
+        )
 
     def test_rejects_wrong_plantuml_extension(self) -> None:
         with self.assertRaisesRegex(
@@ -34,6 +38,13 @@ class ValidateOutputPathTests(unittest.TestCase):
             r"excalidraw output path must use the \.excalidraw extension",
         ):
             validate_output_path("diagram.puml", "excalidraw")
+
+    def test_rejects_wrong_mermaid_extension(self) -> None:
+        with self.assertRaisesRegex(
+            DiagramOutputError,
+            r"mermaid output path must use the \.mmd extension",
+        ):
+            validate_output_path("diagram.puml", "mermaid")
 
     def test_rejects_an_unsupported_output_format(self) -> None:
         with self.assertRaisesRegex(

@@ -2,11 +2,12 @@
 
 ## Current status
 
-`diagrams-cli` implements the validated input pipeline and both renderers:
+`diagrams-cli` implements the validated input pipeline and three renderers:
 
 ```text
 UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
                                                         |-> PlantUML stdout
+                                                        |-> Mermaid flowchart
                                                         `-> layered layout
                                                              `-> Excalidraw JSON
 ```
@@ -22,6 +23,8 @@ UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
 - `diagrams_cli.errors` provides the expected input-error hierarchy.
 - `diagrams_cli.renderers` defines the common callable renderer interface.
 - `diagrams_cli.renderers.plantuml` produces deterministic PlantUML source.
+- `diagrams_cli.renderers.mermaid` produces deterministic Mermaid flowchart
+  text.
 - `diagrams_cli.layout` assigns deterministic, non-overlapping node positions
   by graph depth, direction, and input order.
 - `diagrams_cli.renderers.excalidraw` produces deterministic editable
@@ -29,11 +32,11 @@ UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
 - `diagrams_cli.output` validates format extensions and writes output without
   implicit overwrites.
 - `diagrams_cli.cli` handles CLI arguments and reports loading or validation
-  failures without a traceback and selects either real renderer for stdout or
-  protected file output.
+failures without a traceback and selects any renderer for stdout or
+protected file output.
 
-Keeping the input model independent from output formats allows PlantUML and
-Excalidraw renderers to consume the same validated diagram.
+Keeping the input model independent from output formats allows all three
+renderers to consume the same validated diagram.
 
 ## JSON document
 
@@ -166,6 +169,7 @@ argument and path checks retain their current CLI behavior.
 - Input is file-only at the CLI layer; `loads_diagram` already supports the
   future stdin path.
 - PlantUML source is written to stdout; image rendering is not invoked.
+- Mermaid source is generated without invoking the Mermaid CLI or a browser.
 - Styling, groups, node coordinates, and renderer-specific options are not
   part of the initial portable schema.
 - Excalidraw layout does not route arrows or labels around unrelated elements.

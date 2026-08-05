@@ -30,6 +30,11 @@ class BuildParserTests(unittest.TestCase):
         self.assertEqual(args.input, "diagram.json")
         self.assertEqual(args.format, "excalidraw")
 
+        mermaid_args = build_parser().parse_args(
+            ["diagram.json", "--format", "mermaid"]
+        )
+        self.assertEqual(mermaid_args.format, "mermaid")
+
     def test_parses_output_and_force_arguments(self) -> None:
         args = build_parser().parse_args(
             ["diagram.json", "-o", "diagram.puml", "--force"]
@@ -49,7 +54,9 @@ class BuildParserTests(unittest.TestCase):
 
         message = stderr.getvalue()
         self.assertIn("invalid choice: 'svg'", message)
-        self.assertIn("choose from 'plantuml', 'excalidraw'", message)
+        self.assertIn(
+            "choose from 'plantuml', 'excalidraw', 'mermaid'", message
+        )
 
 
 class MainTests(unittest.TestCase):
@@ -102,6 +109,44 @@ node_1 --> node_2
 @enduml
 """,
         )
+
+    def test_mermaid_arguments_render_to_stdout(self) -> None:
+        stdout = io.StringIO()
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.write_text(
+                '{"nodes": [{"id": "api", "label": "API"}]}',
+                encoding="utf-8",
+            )
+
+            with contextlib.redirect_stdout(stdout):
+                exit_code = main([str(source), "--format", "mermaid"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stdout.getvalue(), 'flowchart TD\n    node_1["API"]\n')
+
+    def test_mermaid_output_argument_writes_mmd_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            destination = Path(directory, "diagram.mmd")
+            source.write_text('{"nodes": []}', encoding="utf-8")
+
+            exit_code = main(
+                [
+                    str(source),
+                    "--format",
+                    "mermaid",
+                    "--output",
+                    str(destination),
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(
+                destination.read_text(encoding="utf-8"),
+                "flowchart TD\n",
+            )
 
     def test_plantuml_output_argument_writes_file_without_stdout(self) -> None:
         stdout = io.StringIO()
@@ -260,7 +305,7 @@ node_1 --> node_2
         help_text = stdout.getvalue()
         self.assertIn("usage: diagrams-cli", help_text)
         self.assertIn(
-            "Generate PlantUML and Excalidraw from JSON.", help_text
+            "Generate PlantUML, Excalidraw, or Mermaid from JSON.", help_text
         )
         self.assertIn("--output", help_text)
         self.assertIn("--force", help_text)

@@ -2,9 +2,9 @@
 
 ## Status
 
-`diagrams-cli` can write generated PlantUML source or Excalidraw JSON directly
-to a file with `--output/-o`. Standard output remains the default when no
-output path is given.
+`diagrams-cli` can write generated PlantUML source, Excalidraw JSON, or Mermaid
+flowchart text directly to a file with `--output/-o`. Standard output remains
+the default when no output path is given.
 
 ```text
 Diagram -> renderer -> stdout
@@ -42,12 +42,21 @@ diagrams-cli examples/04-database-flow.json \
   -o database-flow.excalidraw
 ```
 
+Create a Mermaid flowchart:
+
+```bash
+diagrams-cli examples/04-database-flow.json \
+  --format mermaid \
+  -o database-flow.mmd
+```
+
 ## Extension rules
 
 | Format | Required extension |
 | --- | --- |
 | `plantuml` | `.puml` |
 | `excalidraw` | `.excalidraw` |
+| `mermaid` | `.mmd` |
 
 Extension comparisons are case-insensitive. A path without the expected
 extension is rejected before rendering or writing:
@@ -130,12 +139,13 @@ Unit and CLI integration tests cover:
 - Default stdout behavior
 - PlantUML file creation without stdout noise
 - Case-insensitive format extensions
-- Invalid PlantUML and Excalidraw extensions
+- Invalid PlantUML, Excalidraw, and Mermaid extensions
 - Preservation of existing files
 - Explicit forced replacement
 - Missing parent directories and directory destinations
 - `--force` without `--output`
 - Excalidraw JSON file creation and overwrite protection
+- Mermaid stdout and `.mmd` file creation
 
 ## Remaining output roadmap
 

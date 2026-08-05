@@ -13,6 +13,7 @@ PathInput = Union[str, os.PathLike[str]]
 FORMAT_EXTENSIONS: Dict[str, str] = {
     "plantuml": ".puml",
     "excalidraw": ".excalidraw",
+    "mermaid": ".mmd",
 }
 
 

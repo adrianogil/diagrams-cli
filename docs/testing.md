@@ -8,7 +8,8 @@ The test suite has three boundaries:
 unit tests -> in-process CLI tests -> built-and-installed subprocess tests
 ```
 
-- Unit tests cover validation, layout, renderers, and output helpers directly.
+- Unit tests cover validation, layout, all three renderers, and output helpers
+  directly.
 - In-process CLI tests call `diagrams_cli.cli.main` with controlled streams and
   temporary files for focused argument and error assertions.
 - End-to-end tests build a wheel, install it into a temporary virtual
@@ -55,6 +56,7 @@ The subprocess coverage verifies:
 | --- | --- |
 | Installed `diagrams-cli` | All thirty PlantUML stdout goldens |
 | Installed `python -m diagrams_cli` | All thirty Excalidraw stdout goldens |
+| Installed `diagrams-cli` | Mermaid stdout smoke coverage |
 | Both installed entry points | Help, version, and format-specific file output |
 | Installed console script | Existing-file refusal and explicit `--force` replacement |
 | Installed module | Invalid JSON and invalid output-extension failures |
@@ -80,6 +82,7 @@ PYTHONPATH=src python -m unittest \
   tests.test_excalidraw \
   tests.test_layout \
   tests.test_loader \
+  tests.test_mermaid \
   tests.test_output \
   tests.test_plantuml \
   -v

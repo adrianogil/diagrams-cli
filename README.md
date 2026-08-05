@@ -1,18 +1,20 @@
 # diagrams-cli
 
-Generate PlantUML and Excalidraw diagrams from a shared JSON description.
+Generate PlantUML, Excalidraw, and Mermaid diagrams from a shared JSON
+description.
 
 ## Status
 
 The renderer-independent diagram model, UTF-8 JSON loader, schema validation,
-and deterministic PlantUML and Excalidraw renderers are implemented. Both
-formats support stdout and protected output files.
+and deterministic PlantUML, Excalidraw, and Mermaid renderers are implemented.
+All formats support stdout and protected output files.
 
 See the detailed documentation:
 
 - [Architecture and input schema](docs/architecture-and-input-schema.md)
 - [PlantUML renderer](docs/plantuml-renderer.md)
 - [Excalidraw renderer and layout](docs/excalidraw-renderer.md)
+- [Mermaid renderer](docs/mermaid-renderer.md)
 - [Output files and overwrite protection](docs/output-files.md)
 - [Implementation plan](docs/implementation-plan.md)
 - [Thirty sample diagrams and golden outputs](docs/samples.md)
@@ -48,7 +50,15 @@ diagrams-cli examples/04-database-flow.json \
   -o database-flow.excalidraw
 ```
 
-Both commands are exercised from an isolated wheel installation by the
+Generate Mermaid flowchart text:
+
+```bash
+diagrams-cli examples/04-database-flow.json \
+  --format mermaid \
+  -o database-flow.mmd
+```
+
+All formats are exercised from an isolated wheel installation by the
 end-to-end test suite.
 
 ## Development checks

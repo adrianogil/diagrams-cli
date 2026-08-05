@@ -10,13 +10,22 @@ from diagrams_cli import __version__
 from diagrams_cli.errors import DiagramError
 from diagrams_cli.loader import load_diagram
 from diagrams_cli.output import validate_output_path, write_output_file
-from diagrams_cli.renderers import render_excalidraw, render_plantuml
+from diagrams_cli.renderers import render_excalidraw
+from diagrams_cli.renderers import render_mermaid
+from diagrams_cli.renderers import render_plantuml
+
+
+RENDERERS = {
+    "plantuml": render_plantuml,
+    "excalidraw": render_excalidraw,
+    "mermaid": render_mermaid,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="diagrams-cli",
-        description="Generate PlantUML and Excalidraw from JSON.",
+        description="Generate PlantUML, Excalidraw, or Mermaid from JSON.",
     )
     parser.add_argument(
         "--version",
@@ -30,14 +39,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--format",
-        choices=["plantuml", "excalidraw"],
+        choices=list(RENDERERS),
         default="plantuml",
         help="Output format; defaults to plantuml.",
     )
     parser.add_argument(
         "--output",
         "-o",
-        help="Write to .puml/.excalidraw instead of stdout.",
+        help="Write to .puml/.excalidraw/.mmd instead of stdout.",
     )
     parser.add_argument(
         "--force",
@@ -76,9 +85,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"diagrams-cli: error: {error}", file=sys.stderr)
         return 1
 
-    renderer = (
-        render_plantuml if args.format == "plantuml" else render_excalidraw
-    )
+    renderer = RENDERERS[args.format]
     rendered = renderer(diagram)
     if args.output:
         try:

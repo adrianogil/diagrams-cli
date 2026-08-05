@@ -162,6 +162,15 @@ class InstalledCliTests(unittest.TestCase):
                 self.assertEqual(result.stdout, expected)
                 self.assertEqual(result.stderr, "")
 
+    def test_installed_console_generates_mermaid(self) -> None:
+        source = EXAMPLES_DIRECTORY / "01-empty-diagram.json"
+
+        result = self._run_console(str(source), "--format", "mermaid")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, "flowchart TD\n")
+        self.assertEqual(result.stderr, "")
+
     def test_both_installed_entry_points_write_golden_files(self) -> None:
         source = EXAMPLES_DIRECTORY / "04-database-flow.json"
         cases = (
