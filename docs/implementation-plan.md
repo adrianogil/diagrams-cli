@@ -13,7 +13,8 @@ input -> decode -> validate -> diagram model -> optional layout -> renderer -> o
 
 ## Phase 1: Input model and validation — complete
 
-- [x] Define immutable `Diagram`, `Node`, and `Edge` data classes.
+- [x] Define immutable `Diagram`, `Node`, `Edge`, `Group`, and `Swimlane` data
+      classes.
 - [x] Define portable directions and node types.
 - [x] Load UTF-8 JSON from files and strings.
 - [x] Report JSON source, line, and column on decoding failures.
@@ -28,7 +29,7 @@ input -> decode -> validate -> diagram model -> optional layout -> renderer -> o
 - [x] Record CLI results for all supported format selections.
 
 Acceptance result: valid JSON reaches renderer selection; invalid JSON or
-schema input produces a concise error without a traceback. Thirty distinct
+schema input produces a concise error without a traceback. Thirty-one distinct
 examples now cover progressive complexity plus self-loops, disconnected
 graphs, cycles, joins, feedback paths, and varied architecture domains.
 
@@ -49,7 +50,7 @@ Acceptance criteria:
 - Labels cannot inject unintended PlantUML statements.
 - Repeated runs with the same input produce byte-identical output.
 
-Acceptance result: all thirty example inputs produce byte-stable golden PlantUML
+Acceptance result: all thirty-one example inputs produce byte-stable golden PlantUML
 files, the CLI writes generated source to stdout, unsafe source IDs never
 become aliases, and every golden file passes local PlantUML syntax checking.
 
@@ -95,7 +96,7 @@ Acceptance criteria:
 - Nodes do not overlap in the supported fixture set.
 - Repeated runs produce reviewable, deterministic output.
 
-Acceptance result: all thirty examples produce byte-stable Excalidraw version 2
+Acceptance result: all thirty-one examples produce byte-stable Excalidraw version 2
 documents with non-overlapping node placements, stable metadata, bound arrows,
 and editable text. Strongly connected components make cycles finite and
 predictable, disconnected nodes retain input order, and the CLI supports both
@@ -116,7 +117,33 @@ text on stdout or in protected `.mmd` files. Every portable node type and both
 directions are supported, unsafe IDs are never emitted, and labels cannot add
 unintended Mermaid statements.
 
-## Phase 6: Packaging, automation, and documentation
+## Phase 6: Portable groups and swimlanes — complete
+
+- [x] Extend the immutable model and strict JSON schema with groups and
+      swimlanes.
+- [x] Define unique boundary IDs, node-only membership, and non-empty member
+      lists.
+- [x] Reject duplicate or dangling members and multiple memberships of the
+      same boundary type.
+- [x] Permit one group plus one swimlane per node only when the entire group
+      shares one lane; reject recursive, partial, or cross-lane nesting.
+- [x] Preserve declaration and member order deterministically.
+- [x] Render PlantUML packages inside swimlane frames.
+- [x] Render Mermaid nested subgraphs with direction and safe aliases.
+- [x] Add boundary-aware Excalidraw bands, containers, padding, and
+      non-overlapping layout.
+- [x] Preserve the existing renderer paths and golden bytes for documents
+      without groups or swimlanes.
+- [x] Add schema, layout, renderer, escaping, invalid-input, CLI, installed
+      wheel, and representative golden coverage.
+- [x] Document the compatibility and boundary contract across all outputs.
+
+Acceptance result: one portable membership model produces useful architectural
+boundaries in PlantUML, Mermaid, and Excalidraw. The thirty-first example
+exercises nested groups in two swimlanes, and all prior goldens remain
+byte-identical.
+
+## Phase 7: Packaging, automation, and documentation
 
 - [x] Add installed-command tests for `diagrams-cli` and
       `python -m diagrams_cli`.
@@ -127,7 +154,7 @@ unintended Mermaid statements.
 - [ ] Use one source of truth for the package version.
 - [x] Complete README installation and end-to-end examples.
 - [ ] Add troubleshooting and exit-code references.
-- [ ] Document schema compatibility and future evolution rules.
+- [x] Document schema compatibility and future evolution rules.
 
 Acceptance criteria:
 
@@ -138,17 +165,17 @@ Acceptance criteria:
 Progress result: the test suite builds a wheel without network-dependent build
 isolation, installs it into a temporary virtual environment, removes source
 checkout import paths, and exercises both installed entry points as
-subprocesses. All thirty PlantUML and all thirty Excalidraw stdout results are checked
-byte-for-byte, and file output, overwrite protection, help, version, invalid
-JSON, and extension errors are covered. CI, static-analysis configuration,
-source-distribution inspection, centralized versioning, troubleshooting, and
-schema-evolution documentation remain open.
+subprocesses. All thirty-one PlantUML and all thirty-one Excalidraw stdout
+results plus the representative boundary Mermaid result are checked
+byte-for-byte. File output, overwrite protection, help, version, invalid JSON,
+and extension errors are covered. CI, static-analysis configuration,
+source-distribution inspection, centralized versioning, and troubleshooting
+documentation remain open.
 
 ## Deferred extensions
 
 These should be considered only after the core renderers are stable:
 
-- Groups or containers
 - Explicit positioning hints
 - Styles and themes
 - Additional edge types

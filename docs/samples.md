@@ -1,16 +1,18 @@
 # Sample diagrams
 
-The `examples/` directory contains thirty valid diagram descriptions. The
+The `examples/` directory contains thirty-one valid diagram descriptions. The
 original ten grow from an empty document to a commerce platform. Twenty
 additional focused scenarios exercise self-loops, disconnected nodes, cycles,
 joins, feedback paths, and different architecture domains without requiring
-every example to be larger than the previous one.
+every example to be larger than the previous one. The final scenario exercises
+portable groups and swimlanes.
 
 ## Current renderer status
 
-Both CLI format paths were executed for every sample. Every PlantUML result is
+Both primary CLI format paths were executed for every sample. Every PlantUML result is
 checked in under `examples/plantuml/`, and every editable Excalidraw result is
-checked in under `examples/excalidraw/`.
+checked in under `examples/excalidraw/`. The boundary scenario also has a
+representative Mermaid golden under `examples/mermaid/`.
 
 ## Complexity progression
 
@@ -53,8 +55,9 @@ The original ten remain the progressive baseline:
 | 28 | [`28-observability-pipeline.json`](../examples/28-observability-pipeline.json) | 11 | 13 | [`puml`](../examples/plantuml/28-observability-pipeline.puml) | [`excalidraw`](../examples/excalidraw/28-observability-pipeline.excalidraw) | Logs, traces, metrics, and incident correlation |
 | 29 | [`29-zero-trust-access.json`](../examples/29-zero-trust-access.json) | 11 | 14 | [`puml`](../examples/plantuml/29-zero-trust-access.puml) | [`excalidraw`](../examples/excalidraw/29-zero-trust-access.excalidraw) | Device, identity, policy, audit, and SOC feedback |
 | 30 | [`30-smart-city-platform.json`](../examples/30-smart-city-platform.json) | 12 | 15 | [`puml`](../examples/plantuml/30-smart-city-platform.puml) | [`excalidraw`](../examples/excalidraw/30-smart-city-platform.excalidraw) | Three-domain city operations fan-out |
+| 31 | [`31-platform-boundaries.json`](../examples/31-platform-boundaries.json) | 7 | 6 | [`puml`](../examples/plantuml/31-platform-boundaries.puml) | [`excalidraw`](../examples/excalidraw/31-platform-boundaries.excalidraw) | Groups nested in synchronous and asynchronous swimlanes; representative [`mmd`](../examples/mermaid/31-platform-boundaries.mmd) |
 
-The regression test `tests/test_examples.py` verifies that exactly thirty
+The regression test `tests/test_examples.py` verifies that exactly thirty-one
 distinct, sequentially named samples exist and all validate. It separately
 preserves the increasing `(node count, edge count)` assertion for the original
 ten-sample progression.
@@ -66,6 +69,7 @@ With the package installed:
 ```bash
 diagrams-cli examples/04-database-flow.json --format plantuml
 diagrams-cli examples/04-database-flow.json --format excalidraw
+diagrams-cli examples/31-platform-boundaries.json --format mermaid
 ```
 
 From a source checkout:
@@ -123,6 +127,7 @@ diagrams-cli examples/04-database-flow.json \
 | 28 — Observability pipeline | Exit `0`; golden source | Exit `0`; golden JSON |
 | 29 — Zero-trust access | Exit `0`; golden source | Exit `0`; golden JSON |
 | 30 — Smart city platform | Exit `0`; golden source | Exit `0`; golden JSON |
+| 31 — Platform boundaries | Exit `0`; golden source | Exit `0`; golden JSON |
 
 ## Recorded CLI output
 
@@ -150,13 +155,15 @@ metadata. Its complete result is checked in at
 The sample inputs now serve as renderer fixtures:
 
 - PlantUML runs are compared with byte-stable checked-in `.puml` text.
-- All thirty PlantUML golden files pass `plantuml -checkonly` syntax validation.
+- All thirty-one PlantUML golden files pass `plantuml -checkonly` syntax validation.
 - Excalidraw runs are compared with byte-stable `.excalidraw` JSON and
   structurally checked for metadata, element arrays, and non-overlapping node
   placements.
-- Installed subprocess tests compare all thirty PlantUML results through
-  `diagrams-cli` and all thirty Excalidraw results through
-  `python -m diagrams_cli`.
+- The boundary scenario has a Mermaid golden covering nested subgraphs.
+- Installed subprocess tests compare all thirty-one PlantUML results through
+  `diagrams-cli`, all thirty-one Excalidraw results through
+  `python -m diagrams_cli`, and the boundary Mermaid golden through the console
+  script.
 
 See [Testing and golden fixtures](testing.md) for the fixture contract,
 installed-wheel isolation, coverage matrix, and regeneration workflow.

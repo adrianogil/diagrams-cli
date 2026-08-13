@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 
 from diagrams_cli.layout import layout_diagram
-from diagrams_cli.model import Diagram, Edge, Node
+from diagrams_cli.model import Diagram, Edge, Group, Node, Swimlane
 
 
 class LayeredLayoutTests(unittest.TestCase):
@@ -89,6 +89,95 @@ class LayeredLayoutTests(unittest.TestCase):
         )
 
         self.assertEqual(layout_diagram(diagram), layout_diagram(diagram))
+
+    def test_groups_are_contained_by_their_shared_swimlane(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("a", "A"), Node("b", "B"), Node("c", "C")),
+            edges=(Edge("a", "b"), Edge("b", "c")),
+            direction="left-to-right",
+            groups=(Group("services", "Services", ("a", "b")),),
+            swimlanes=(Swimlane("cloud", "Cloud", ("a", "b", "c")),),
+        )
+
+        layout = layout_diagram(diagram)
+        group = layout.groups[0]
+        lane = layout.swimlanes[0]
+        placements = {item.node.id: item for item in layout.placements}
+
+        self.assertEqual(group.swimlane_id, "cloud")
+        self.assertGreaterEqual(group.x, lane.x)
+        self.assertGreaterEqual(group.y, lane.y)
+        self.assertLessEqual(group.x + group.width, lane.x + lane.width)
+        self.assertLessEqual(group.y + group.height, lane.y + lane.height)
+        for node_id in ("a", "b"):
+            node = placements[node_id]
+            self.assertGreaterEqual(node.x, group.x)
+            self.assertGreaterEqual(node.y, group.y)
+            self.assertLessEqual(node.x + node.width, group.x + group.width)
+            self.assertLessEqual(node.y + node.height, group.y + group.height)
+
+    def test_swimlanes_are_parallel_non_overlapping_bands(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("a", "A"), Node("b", "B")),
+            direction="left-to-right",
+            swimlanes=(
+                Swimlane("one", "One", ("a",)),
+                Swimlane("two", "Two", ("b",)),
+            ),
+        )
+
+        first, second = layout_diagram(diagram).swimlanes
+
+        self.assertEqual(first.x, second.x)
+        self.assertEqual(first.width, second.width)
+        self.assertLessEqual(first.y + first.height, second.y)
+
+    def test_top_to_bottom_swimlanes_are_parallel_columns(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("a", "A"), Node("b", "B")),
+            swimlanes=(
+                Swimlane("one", "One", ("a",)),
+                Swimlane("two", "Two", ("b",)),
+            ),
+        )
+
+        first, second = layout_diagram(diagram).swimlanes
+
+        self.assertEqual(first.y, second.y)
+        self.assertEqual(first.height, second.height)
+        self.assertLessEqual(first.x + first.width, second.x)
+
+    def test_grouped_nodes_and_sibling_boundaries_do_not_overlap(self) -> None:
+        diagram = Diagram(
+            nodes=tuple(Node(str(index), str(index)) for index in range(6)),
+            groups=(
+                Group("first", "First", ("0", "1")),
+                Group("second", "Second", ("2", "3")),
+            ),
+            swimlanes=(
+                Swimlane("lane-a", "Lane A", ("0", "1", "2", "3")),
+                Swimlane("lane-b", "Lane B", ("4", "5")),
+            ),
+            direction="left-to-right",
+        )
+
+        layout = layout_diagram(diagram)
+
+        for index, first in enumerate(layout.placements):
+            for second in layout.placements[index + 1 :]:
+                self.assertTrue(_separated(first, second))
+        self.assertTrue(_separated(layout.groups[0], layout.groups[1]))
+        self.assertTrue(_separated(layout.swimlanes[0], layout.swimlanes[1]))
+        self.assertEqual(layout, layout_diagram(diagram))
+
+
+def _separated(first: object, second: object) -> bool:
+    return (
+        first.x + first.width <= second.x
+        or second.x + second.width <= first.x
+        or first.y + first.height <= second.y
+        or second.y + second.height <= first.y
+    )
 
 
 if __name__ == "__main__":

@@ -94,6 +94,25 @@ node_2 --> node_3 : Read profile
 
 An absent or empty label omits the colon and label text.
 
+## Groups and swimlanes
+
+Portable boundaries map to native PlantUML containers:
+
+| Portable boundary | PlantUML construct |
+| --- | --- |
+| Group | `package` |
+| Swimlane | `frame` |
+
+A group whose members share a swimlane is nested inside that frame. Standalone
+groups remain top-level packages; lane-free and group-free nodes remain
+top-level declarations. Generated aliases such as `group_1` and `swimlane_1`
+isolate source IDs from PlantUML syntax. Boundary labels use the same escaping
+as titles and node labels.
+
+Containers follow validated membership order. All nodes are declared once,
+then edges are emitted in their original order, including relationships that
+cross group or lane boundaries.
+
 ## Text safety
 
 User titles, node labels, and edge labels are kept on one PlantUML source line.
@@ -140,7 +159,7 @@ node_2 --> node_3 : Read profile
 @enduml
 ```
 
-See [Sample diagrams](samples.md) for all thirty inputs and golden outputs.
+See [Sample diagrams](samples.md) for all thirty-one inputs and golden outputs.
 
 ## Verification
 
@@ -150,9 +169,10 @@ The test suite covers:
 - Every portable node-type mapping
 - Titles, both directions, labeled and unlabeled edges
 - Escaping and isolation of unsafe source IDs
+- Groups, swimlanes, nesting, boundary-label escaping, and cross-boundary edges
 - Determinism
 - CLI stdout behavior
-- Byte-for-byte golden output for all thirty samples
+- Byte-for-byte golden output for all thirty-one samples
 
 When a local PlantUML command is available, syntax can be checked with:
 

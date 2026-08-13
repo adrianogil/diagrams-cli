@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from diagrams_cli.model import Diagram, Edge, Node
+from diagrams_cli.model import Diagram, Edge, Group, Node, Swimlane
 from diagrams_cli.renderers import Renderer, render_mermaid
 
 
@@ -75,6 +75,57 @@ class MermaidRendererTests(unittest.TestCase):
         )
 
         self.assertEqual(render_mermaid(diagram), render_mermaid(diagram))
+
+    def test_renders_groups_nested_in_swimlanes(self) -> None:
+        diagram = Diagram(
+            nodes=(
+                Node("api", "API", "service"),
+                Node("db", "Database", "database"),
+                Node("user", "User", "actor"),
+            ),
+            edges=(Edge("user", "api", "Calls"), Edge("api", "db")),
+            groups=(Group("backend", "Backend", ("api", "db")),),
+            swimlanes=(Swimlane("cloud", "Cloud", ("api", "db")),),
+        )
+
+        self.assertEqual(
+            render_mermaid(diagram),
+            """flowchart TD
+    subgraph swimlane_1["Cloud"]
+        direction TD
+        subgraph group_1["Backend"]
+            direction TD
+            node_1["API"]
+            node_2[("Database")]
+        end
+    end
+    node_3(["User"])
+
+    node_3 -->|"Calls"| node_1
+    node_1 --> node_2
+""",
+        )
+
+    def test_escapes_boundary_labels_and_hides_boundary_ids(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("node", "Node"),),
+            swimlanes=(
+                Swimlane(
+                    'unsafe"]\nend',
+                    'Ops "Lane"\n|<team>',
+                    ("node",),
+                ),
+            ),
+        )
+
+        rendered = render_mermaid(diagram)
+
+        self.assertIn(
+            'subgraph swimlane_1["Ops &quot;Lane&quot;<br/>'
+            '&#124;&lt;team&gt;"]',
+            rendered,
+        )
+        self.assertNotIn("unsafe", rendered)
 
 
 if __name__ == "__main__":

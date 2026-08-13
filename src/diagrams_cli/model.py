@@ -28,6 +28,24 @@ class Edge:
 
 
 @dataclass(frozen=True)
+class Group:
+    """A named architectural boundary containing diagram nodes."""
+
+    id: str
+    label: str
+    members: Tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Swimlane:
+    """A named responsibility lane containing diagram nodes."""
+
+    id: str
+    label: str
+    members: Tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Diagram:
     """A validated diagram that can be passed to any renderer."""
 
@@ -35,3 +53,5 @@ class Diagram:
     edges: Tuple[Edge, ...] = ()
     title: Optional[str] = None
     direction: DiagramDirection = "top-to-bottom"
+    groups: Tuple[Group, ...] = ()
+    swimlanes: Tuple[Swimlane, ...] = ()

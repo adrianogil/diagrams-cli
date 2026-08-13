@@ -126,6 +126,38 @@ node_1 --> node_2
         self.assertEqual(exit_code, 0)
         self.assertEqual(stdout.getvalue(), 'flowchart TD\n    node_1["API"]\n')
 
+    def test_grouped_input_renders_boundaries_in_every_format(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "api", "label": "API", "type": "service"}],
+          "groups": [
+            {"id": "services", "label": "Services", "members": ["api"]}
+          ],
+          "swimlanes": [
+            {"id": "cloud", "label": "Cloud", "members": ["api"]}
+          ]
+        }
+        """
+        expectations = {
+            "plantuml": 'frame "Cloud" as swimlane_1',
+            "mermaid": 'subgraph swimlane_1["Cloud"]',
+            "excalidraw": '"id": "swimlane-1-boundary"',
+        }
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory, "source.json")
+            source.write_text(content, encoding="utf-8")
+            for output_format, expected in expectations.items():
+                with self.subTest(output_format=output_format):
+                    stdout = io.StringIO()
+                    with contextlib.redirect_stdout(stdout):
+                        exit_code = main(
+                            [str(source), "--format", output_format]
+                        )
+
+                    self.assertEqual(exit_code, 0)
+                    self.assertIn(expected, stdout.getvalue())
+
     def test_mermaid_output_argument_writes_mmd_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory, "source.json")

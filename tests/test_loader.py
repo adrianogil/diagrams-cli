@@ -8,7 +8,7 @@ from pathlib import Path
 
 from diagrams_cli.errors import DiagramLoadError, DiagramValidationError
 from diagrams_cli.loader import load_diagram, loads_diagram
-from diagrams_cli.model import Diagram, Edge, Node
+from diagrams_cli.model import Diagram, Edge, Group, Node, Swimlane
 
 
 class LoadDiagramTests(unittest.TestCase):
@@ -55,6 +55,29 @@ class LoadDiagramTests(unittest.TestCase):
         self.assertEqual(diagram.direction, "top-to-bottom")
         self.assertEqual(diagram.nodes, (Node("api", "API", "generic"),))
         self.assertEqual(diagram.edges, ())
+        self.assertEqual(diagram.groups, ())
+        self.assertEqual(diagram.swimlanes, ())
+
+    def test_loads_groups_and_swimlanes_in_declared_order(self) -> None:
+        diagram = loads_diagram(
+            """
+            {
+              "nodes": [
+                {"id": "a", "label": "A"},
+                {"id": "b", "label": "B"}
+              ],
+              "groups": [
+                {"id": "g", "label": "Services", "members": ["a", "b"]}
+              ],
+              "swimlanes": [
+                {"id": "l", "label": "Cloud", "members": ["a", "b"]}
+              ]
+            }
+            """
+        )
+
+        self.assertEqual(diagram.groups, (Group("g", "Services", ("a", "b")),))
+        self.assertEqual(diagram.swimlanes, (Swimlane("l", "Cloud", ("a", "b")),))
 
     def test_reports_malformed_json_location(self) -> None:
         with self.assertRaisesRegex(
@@ -160,6 +183,162 @@ class DiagramValidationTests(unittest.TestCase):
 
         with self.assertRaisesRegex(
             DiagramValidationError, "document.direction must be one of"
+        ):
+            loads_diagram(content)
+
+    def test_rejects_duplicate_boundary_ids_across_types(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "groups": [{"id": "boundary", "label": "G", "members": ["a"]}],
+          "swimlanes": [{"id": "boundary", "label": "L", "members": ["a"]}]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError, 'duplicates boundary id "boundary"'
+        ):
+            loads_diagram(content)
+
+    def test_rejects_duplicate_member_within_boundary(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "groups": [
+            {"id": "g", "label": "Group", "members": ["a", "a"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'document.groups\[0\].members\[1\] duplicates node "a"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_dangling_boundary_member(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "swimlanes": [
+            {"id": "lane", "label": "Lane", "members": ["missing"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'document.swimlanes\[0\].members\[0\] references unknown node "missing"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_node_assigned_to_multiple_groups(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "groups": [
+            {"id": "first", "label": "First", "members": ["a"]},
+            {"id": "second", "label": "Second", "members": ["a"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'assigns node "a" to multiple groups: "first" and "second"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_node_assigned_to_multiple_swimlanes(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "swimlanes": [
+            {"id": "first", "label": "First", "members": ["a"]},
+            {"id": "second", "label": "Second", "members": ["a"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'assigns node "a" to multiple swimlanes: "first" and "second"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_group_spanning_swimlanes(self) -> None:
+        content = """
+        {
+          "nodes": [
+            {"id": "a", "label": "A"},
+            {"id": "b", "label": "B"}
+          ],
+          "groups": [
+            {"id": "g", "label": "Group", "members": ["a", "b"]}
+          ],
+          "swimlanes": [
+            {"id": "one", "label": "One", "members": ["a"]},
+            {"id": "two", "label": "Two", "members": ["b"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'boundary "g" spans multiple swimlanes: "one", "two"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_implicit_partial_group_nesting(self) -> None:
+        content = """
+        {
+          "nodes": [
+            {"id": "a", "label": "A"},
+            {"id": "b", "label": "B"}
+          ],
+          "groups": [
+            {"id": "g", "label": "Group", "members": ["a", "b"]}
+          ],
+          "swimlanes": [
+            {"id": "one", "label": "One", "members": ["a"]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'boundary "g" spans multiple swimlanes: no swimlane, "one"',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_nested_boundary_objects(self) -> None:
+        content = """
+        {
+          "nodes": [{"id": "a", "label": "A"}],
+          "groups": [
+            {"id": "outer", "label": "Outer", "members": [
+              {"id": "inner", "members": ["a"]}
+            ]}
+          ]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError,
+            r'document.groups\[0\].members\[0\] must be a non-empty string',
+        ):
+            loads_diagram(content)
+
+    def test_rejects_empty_boundary_members(self) -> None:
+        content = """
+        {
+          "nodes": [],
+          "groups": [{"id": "g", "label": "Group", "members": []}]
+        }
+        """
+
+        with self.assertRaisesRegex(
+            DiagramValidationError, "members must contain at least one node id"
         ):
             loads_diagram(content)
 

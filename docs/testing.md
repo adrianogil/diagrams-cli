@@ -22,17 +22,19 @@ or differences at the process boundary.
 
 ## Golden fixture inventory
 
-The same thirty JSON inputs drive both renderer fixture sets:
+The same thirty-one JSON inputs drive both primary renderer fixture sets:
 
 ```text
 examples/*.json
 examples/plantuml/*.puml
 examples/excalidraw/*.excalidraw
+examples/mermaid/31-platform-boundaries.mmd
 ```
 
-There are thirty PlantUML and thirty Excalidraw golden files. The original ten
+There are thirty-one PlantUML and thirty-one Excalidraw golden files. The original ten
 inputs increase progressively in size; the next twenty target distinct graph
-structures and application domains. A golden is the exact UTF-8 output
+structures and application domains; the final input covers groups and
+swimlanes. Its representative Mermaid golden covers nested subgraphs. A golden is the exact UTF-8 output
 expected for its input, including whitespace and the final newline. This makes
 determinism regressions visible in code review.
 
@@ -54,9 +56,9 @@ The subprocess coverage verifies:
 
 | Boundary | Coverage |
 | --- | --- |
-| Installed `diagrams-cli` | All thirty PlantUML stdout goldens |
-| Installed `python -m diagrams_cli` | All thirty Excalidraw stdout goldens |
-| Installed `diagrams-cli` | Mermaid stdout smoke coverage |
+| Installed `diagrams-cli` | All thirty-one PlantUML stdout goldens |
+| Installed `python -m diagrams_cli` | All thirty-one Excalidraw stdout goldens |
+| Installed `diagrams-cli` | Boundary Mermaid stdout golden |
 | Both installed entry points | Help, version, and format-specific file output |
 | Installed console script | Existing-file refusal and explicit `--force` replacement |
 | Installed module | Invalid JSON and invalid output-extension failures |

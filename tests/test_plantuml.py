@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from diagrams_cli.model import Diagram, Edge, Node
+from diagrams_cli.model import Diagram, Edge, Group, Node, Swimlane
 from diagrams_cli.renderers import Renderer, render_plantuml
 
 
@@ -89,6 +89,56 @@ node_2 --> node_3
         )
 
         self.assertEqual(render_plantuml(diagram), render_plantuml(diagram))
+
+    def test_renders_groups_nested_in_swimlanes(self) -> None:
+        diagram = Diagram(
+            nodes=(
+                Node("api", "API", "service"),
+                Node("db", "Database", "database"),
+                Node("user", "User", "actor"),
+            ),
+            edges=(Edge("user", "api", "Calls"), Edge("api", "db")),
+            groups=(Group("backend", "Backend", ("api", "db")),),
+            swimlanes=(Swimlane("cloud", "Cloud", ("api", "db")),),
+        )
+
+        self.assertEqual(
+            render_plantuml(diagram),
+            """@startuml
+frame "Cloud" as swimlane_1 {
+  package "Backend" as group_1 {
+    component "API" as node_1
+    database "Database" as node_2
+  }
+}
+actor "User" as node_3
+
+node_3 --> node_1 : Calls
+node_1 --> node_2
+@enduml
+""",
+        )
+
+    def test_escapes_boundary_labels_and_hides_boundary_ids(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("node", "Node"),),
+            groups=(
+                Group(
+                    'unsafe"\npackage injected',
+                    'Ops "Group"\n%label',
+                    ("node",),
+                ),
+            ),
+        )
+
+        rendered = render_plantuml(diagram)
+
+        self.assertIn(
+            'package "Ops \\"Group\\"%n()%percent()label" as group_1',
+            rendered,
+        )
+        self.assertNotIn("unsafe", rendered)
+        self.assertNotIn("\npackage injected", rendered)
 
 
 if __name__ == "__main__":

@@ -6,6 +6,10 @@
 flowchart text directly to a file with `--output/-o`. Standard output remains
 the default when no output path is given.
 
+Groups and swimlanes require no renderer-specific output option. They travel
+through the validated diagram model and appear in any selected format;
+extension and overwrite rules remain unchanged.
+
 ```text
 Diagram -> renderer -> stdout
                     `-> validated output path -> protected UTF-8 file

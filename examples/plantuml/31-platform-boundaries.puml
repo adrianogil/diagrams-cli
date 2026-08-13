@@ -1,0 +1,27 @@
+@startuml
+title Order Platform Boundaries
+left to right direction
+
+frame "Synchronous Request Path" as swimlane_1 {
+  actor "Customer" as node_1
+  package "Request Services" as group_1 {
+    component "API Gateway" as node_2
+    component "Orders Service" as node_3
+  }
+  database "Orders Database" as node_4
+}
+frame "Asynchronous Processing" as swimlane_2 {
+  package "Background Workers" as group_2 {
+    queue "Order Jobs" as node_5
+    component "Fulfillment Worker" as node_6
+  }
+  database "Audit Store" as node_7
+}
+
+node_1 --> node_2 : HTTPS
+node_2 --> node_3 : Route order
+node_3 --> node_4 : Persist
+node_3 --> node_5 : Enqueue
+node_5 --> node_6 : Consume
+node_6 --> node_7 : Record
+@enduml

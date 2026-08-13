@@ -8,18 +8,22 @@ from pathlib import Path
 
 from diagrams_cli.layout import layout_diagram
 from diagrams_cli.loader import load_diagram
-from diagrams_cli.renderers import render_excalidraw, render_plantuml
+from diagrams_cli.renderers import (
+    render_excalidraw,
+    render_mermaid,
+    render_plantuml,
+)
 
 
 class ExampleTests(unittest.TestCase):
-    def test_all_thirty_examples_are_valid_and_distinct(self) -> None:
+    def test_all_thirty_one_examples_are_valid_and_distinct(self) -> None:
         examples_directory = Path(__file__).parents[1] / "examples"
         examples = sorted(examples_directory.glob("*.json"))
 
-        self.assertEqual(len(examples), 30)
+        self.assertEqual(len(examples), 31)
         self.assertEqual(
             [example.name[:3] for example in examples],
-            [f"{index:02d}-" for index in range(1, 31)],
+            [f"{index:02d}-" for index in range(1, 32)],
         )
         self.assertEqual(
             len({example.read_text(encoding="utf-8") for example in examples}),
@@ -88,6 +92,15 @@ class ExampleTests(unittest.TestCase):
                             or first.y + first.height <= second.y
                             or second.y + second.height <= first.y
                         )
+
+    def test_boundary_example_matches_its_mermaid_golden_file(self) -> None:
+        examples_directory = Path(__file__).parents[1] / "examples"
+        source = examples_directory / "31-platform-boundaries.json"
+        expected = (
+            examples_directory / "mermaid" / "31-platform-boundaries.mmd"
+        ).read_text(encoding="utf-8")
+
+        self.assertEqual(render_mermaid(load_diagram(source)), expected)
 
 
 if __name__ == "__main__":

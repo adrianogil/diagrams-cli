@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
-from diagrams_cli.model import Diagram, Node
+from diagrams_cli.model import Diagram, Group, Node, Swimlane
 
 NODE_WIDTH = 220
 NODE_HEIGHT = 100
@@ -13,6 +13,9 @@ CANVAS_MARGIN = 100
 TITLE_SPACE = 60
 LAYER_GAP = 160
 NODE_GAP = 80
+BOUNDARY_GAP = 80
+BOUNDARY_PADDING = 40
+BOUNDARY_HEADER = 50
 
 
 @dataclass(frozen=True)
@@ -28,10 +31,35 @@ class NodePlacement:
 
 
 @dataclass(frozen=True)
+class GroupPlacement:
+    """The bounding rectangle assigned to one architectural group."""
+
+    group: Group
+    x: int
+    y: int
+    width: int
+    height: int
+    swimlane_id: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class SwimlanePlacement:
+    """The bounding rectangle assigned to one responsibility swimlane."""
+
+    swimlane: Swimlane
+    x: int
+    y: int
+    width: int
+    height: int
+
+
+@dataclass(frozen=True)
 class LayeredLayout:
     """An immutable, input-ordered collection of node placements."""
 
     placements: Tuple[NodePlacement, ...]
+    groups: Tuple[GroupPlacement, ...] = ()
+    swimlanes: Tuple[SwimlanePlacement, ...] = ()
 
 
 def layout_diagram(diagram: Diagram) -> LayeredLayout:
@@ -40,6 +68,12 @@ def layout_diagram(diagram: Diagram) -> LayeredLayout:
     Strongly connected nodes share one layer, turning the graph into a DAG
     before depth is calculated. Nodes within a layer retain input order.
     """
+    if diagram.groups or diagram.swimlanes:
+        return _layout_boundaries(diagram)
+    return _layout_graph(diagram)
+
+
+def _layout_graph(diagram: Diagram) -> LayeredLayout:
     if not diagram.nodes:
         return LayeredLayout(placements=())
 
@@ -96,6 +130,253 @@ def layout_diagram(diagram: Diagram) -> LayeredLayout:
         for node in diagram.nodes
     )
     return LayeredLayout(placements=placements)
+
+
+@dataclass(frozen=True)
+class _LayoutItem:
+    kind: str
+    item_id: str
+    width: int
+    height: int
+
+
+def _layout_boundaries(diagram: Diagram) -> LayeredLayout:
+    """Lay out flat lanes with optional, unambiguous nested groups."""
+    graph_layout = _layout_graph(diagram)
+    layers = {
+        placement.node.id: placement.layer
+        for placement in graph_layout.placements
+    }
+    groups = {group.id: group for group in diagram.groups}
+    group_of = {
+        member: group.id
+        for group in diagram.groups
+        for member in group.members
+    }
+    lane_of = {
+        member: lane.id
+        for lane in diagram.swimlanes
+        for member in lane.members
+    }
+    group_lane = {
+        group.id: lane_of.get(group.members[0]) for group in diagram.groups
+    }
+
+    node_coordinates: Dict[str, Tuple[int, int]] = {}
+    group_coordinates: Dict[str, Tuple[int, int, int, int]] = {}
+    lane_coordinates: Dict[str, Tuple[int, int, int, int]] = {}
+    primary_origin = CANVAS_MARGIN + (TITLE_SPACE if diagram.title else 0)
+    cross_cursor = CANVAS_MARGIN
+
+    lane_specs: List[Tuple[Swimlane, List[_LayoutItem], int, int]] = []
+    for lane in diagram.swimlanes:
+        items = _boundary_items(
+            lane.members,
+            group_of,
+            groups,
+            allowed_lane=lane.id,
+            group_lane=group_lane,
+            direction=diagram.direction,
+        )
+        width, height = _container_size(
+            items, diagram.direction, lane.label
+        )
+        lane_specs.append((lane, items, width, height))
+
+    if lane_specs:
+        maximum_primary = max(
+            width if diagram.direction == "left-to-right" else height
+            for _, _, width, height in lane_specs
+        )
+    else:
+        maximum_primary = 0
+
+    for lane, items, width, height in lane_specs:
+        if diagram.direction == "left-to-right":
+            width = maximum_primary
+            lane_x, lane_y = primary_origin, cross_cursor
+            cross_cursor += height + BOUNDARY_GAP
+        else:
+            height = maximum_primary
+            lane_x, lane_y = cross_cursor, primary_origin
+            cross_cursor += width + BOUNDARY_GAP
+        lane_coordinates[lane.id] = (lane_x, lane_y, width, height)
+        _place_items(
+            items,
+            lane_x + BOUNDARY_PADDING,
+            lane_y + BOUNDARY_HEADER + BOUNDARY_PADDING,
+            diagram.direction,
+            groups,
+            node_coordinates,
+            group_coordinates,
+        )
+
+    standalone_members = tuple(
+        node.id
+        for node in diagram.nodes
+        if node.id not in lane_of
+    )
+    standalone_items = _boundary_items(
+        standalone_members,
+        group_of,
+        groups,
+        allowed_lane=None,
+        group_lane=group_lane,
+        direction=diagram.direction,
+    )
+    if standalone_items:
+        if diagram.direction == "left-to-right":
+            standalone_x, standalone_y = primary_origin, cross_cursor
+        else:
+            standalone_x, standalone_y = cross_cursor, primary_origin
+        _place_items(
+            standalone_items,
+            standalone_x,
+            standalone_y,
+            diagram.direction,
+            groups,
+            node_coordinates,
+            group_coordinates,
+        )
+
+    placements = tuple(
+        NodePlacement(
+            node=node,
+            x=node_coordinates[node.id][0],
+            y=node_coordinates[node.id][1],
+            width=NODE_WIDTH,
+            height=NODE_HEIGHT,
+            layer=layers[node.id],
+        )
+        for node in diagram.nodes
+    )
+    group_placements = tuple(
+        GroupPlacement(
+            group=group,
+            x=group_coordinates[group.id][0],
+            y=group_coordinates[group.id][1],
+            width=group_coordinates[group.id][2],
+            height=group_coordinates[group.id][3],
+            swimlane_id=group_lane[group.id],
+        )
+        for group in diagram.groups
+    )
+    swimlane_placements = tuple(
+        SwimlanePlacement(
+            swimlane=lane,
+            x=lane_coordinates[lane.id][0],
+            y=lane_coordinates[lane.id][1],
+            width=lane_coordinates[lane.id][2],
+            height=lane_coordinates[lane.id][3],
+        )
+        for lane in diagram.swimlanes
+    )
+    return LayeredLayout(
+        placements=placements,
+        groups=group_placements,
+        swimlanes=swimlane_placements,
+    )
+
+
+def _boundary_items(
+    member_ids: Tuple[str, ...],
+    group_of: Dict[str, str],
+    groups: Dict[str, Group],
+    *,
+    allowed_lane: Optional[str],
+    group_lane: Dict[str, Optional[str]],
+    direction: str,
+) -> List[_LayoutItem]:
+    items: List[_LayoutItem] = []
+    emitted_groups: Set[str] = set()
+    for node_id in member_ids:
+        group_id = group_of.get(node_id)
+        if group_id is not None and group_lane[group_id] == allowed_lane:
+            if group_id in emitted_groups:
+                continue
+            emitted_groups.add(group_id)
+            width, height = _group_size(groups[group_id], direction)
+            items.append(_LayoutItem("group", group_id, width, height))
+        elif group_id is None:
+            items.append(
+                _LayoutItem("node", node_id, NODE_WIDTH, NODE_HEIGHT)
+            )
+    return items
+
+
+def _group_size(group: Group, direction: str) -> Tuple[int, int]:
+    count = len(group.members)
+    if direction == "left-to-right":
+        content_width = count * NODE_WIDTH + (count - 1) * NODE_GAP
+        content_height = NODE_HEIGHT
+    else:
+        content_width = NODE_WIDTH
+        content_height = count * NODE_HEIGHT + (count - 1) * NODE_GAP
+    return (
+        max(
+            content_width + 2 * BOUNDARY_PADDING,
+            _label_width(group.label),
+        ),
+        content_height + BOUNDARY_HEADER + 2 * BOUNDARY_PADDING,
+    )
+
+
+def _container_size(
+    items: List[_LayoutItem], direction: str, label: str
+) -> Tuple[int, int]:
+    if direction == "left-to-right":
+        content_width = sum(item.width for item in items)
+        content_width += max(0, len(items) - 1) * BOUNDARY_GAP
+        content_height = max(item.height for item in items)
+    else:
+        content_width = max(item.width for item in items)
+        content_height = sum(item.height for item in items)
+        content_height += max(0, len(items) - 1) * BOUNDARY_GAP
+    return (
+        max(content_width + 2 * BOUNDARY_PADDING, _label_width(label)),
+        content_height + BOUNDARY_HEADER + 2 * BOUNDARY_PADDING,
+    )
+
+
+def _label_width(label: str) -> int:
+    longest_line = max(len(line) for line in label.splitlines() or [""])
+    return longest_line * 11 + 2 * BOUNDARY_PADDING
+
+
+def _place_items(
+    items: List[_LayoutItem],
+    x: int,
+    y: int,
+    direction: str,
+    groups: Dict[str, Group],
+    node_coordinates: Dict[str, Tuple[int, int]],
+    group_coordinates: Dict[str, Tuple[int, int, int, int]],
+) -> None:
+    cursor_x, cursor_y = x, y
+    for item in items:
+        if item.kind == "group":
+            group = groups[item.item_id]
+            group_coordinates[group.id] = (
+                cursor_x,
+                cursor_y,
+                item.width,
+                item.height,
+            )
+            node_x = cursor_x + BOUNDARY_PADDING
+            node_y = cursor_y + BOUNDARY_HEADER + BOUNDARY_PADDING
+            for member in group.members:
+                node_coordinates[member] = (node_x, node_y)
+                if direction == "left-to-right":
+                    node_x += NODE_WIDTH + NODE_GAP
+                else:
+                    node_y += NODE_HEIGHT + NODE_GAP
+        else:
+            node_coordinates[item.item_id] = (cursor_x, cursor_y)
+
+        if direction == "left-to-right":
+            cursor_x += item.width + BOUNDARY_GAP
+        else:
+            cursor_y += item.height + BOUNDARY_GAP
 
 
 def _strongly_connected_components(

@@ -62,7 +62,8 @@ for placement in layout.placements:
 
 ## Deterministic layered layout
 
-The layout derives graph depth before rendering:
+For documents without boundaries, the layout derives graph depth before
+rendering:
 
 1. Calculate strongly connected components in node input order.
 2. Collapse each component into one vertex, producing an acyclic graph.
@@ -78,6 +79,15 @@ terminates and remains stable. Fixed node sizes and gaps prevent node overlap.
 Self-edges use a visible loop on the right side of their node. Other arrows
 connect the facing horizontal or vertical boundaries of their endpoints.
 
+Boundary documents use a deterministic container layout. Left-to-right
+swimlanes become equal-width horizontal bands; top-to-bottom swimlanes become
+equal-height vertical columns. Members follow declared lane order, groups are
+placed at their first member, and group members follow group order. Fixed
+header space, padding, and gaps keep labels readable, nodes non-overlapping,
+groups inside their lane, and sibling groups or lanes separate. Graph-depth
+layers are still calculated and retained in the layout result even though
+container membership controls boundary-document coordinates.
+
 ## Visual vocabulary
 
 | Portable type | Shape | Fill color |
@@ -91,6 +101,11 @@ connect the facing horizontal or vertical boundaries of their endpoints.
 Each node consists of a shape and centered bound text element. Directed edges
 are arrow elements bound to their source and target shapes. Edge labels are
 independent text elements placed near the arrow midpoint.
+
+Swimlanes are light-gray solid rounded rectangles. Groups are light-indigo
+dashed rounded rectangles. Boundary elements are emitted before arrows and
+nodes so they behave as visual backgrounds, with independent editable labels
+in their header space.
 
 ## Excalidraw document structure
 
@@ -139,10 +154,12 @@ The automated suite checks:
 - Container and arrow bindings
 - Both layout directions
 - Disconnected graphs, multi-node cycles, and self-edges
+- Groups nested in swimlanes, standalone groups, both lane orientations, and
+  containment/non-overlap invariants
 - Stable IDs, seeds, version values, and timestamps
-- No node overlap across all thirty examples
+- No node overlap across all thirty-one examples
 - CLI stdout and protected file output
-- Byte-for-byte golden output for all thirty examples
+- Byte-for-byte golden output for all thirty-one examples
 
 Run the checks:
 
@@ -157,7 +174,7 @@ python -m compileall -q src tests
 - Edge labels are placed near arrow midpoints but do not participate in
   collision avoidance.
 - Actor and database nodes use distinct colors but share the ellipse shape.
-- Explicit positioning, themes, groups, containers, and images are outside the
-  portable schema.
+- Explicit positioning, themes, recursive boundary nesting, and images are
+  outside the portable schema.
 - The CLI still accepts input files only; stdin and explicit `-` streams remain
   planned.

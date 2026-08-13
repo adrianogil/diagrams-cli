@@ -6,7 +6,12 @@ import hashlib
 import json
 from typing import Any, Dict, List, Optional, Tuple
 
-from diagrams_cli.layout import NodePlacement, layout_diagram
+from diagrams_cli.layout import (
+    GroupPlacement,
+    NodePlacement,
+    SwimlanePlacement,
+    layout_diagram,
+)
 from diagrams_cli.model import Diagram, NodeType
 
 Element = Dict[str, Any]
@@ -44,6 +49,12 @@ def render_excalidraw(diagram: Diagram) -> str:
     elements: List[Element] = []
     if diagram.title:
         elements.append(_title_element(diagram.title))
+    for index, placement in enumerate(layout.swimlanes, start=1):
+        elements.append(_swimlane_element(index, placement))
+        elements.append(_swimlane_label_element(index, placement))
+    for index, placement in enumerate(layout.groups, start=1):
+        elements.append(_group_element(index, placement))
+        elements.append(_group_label_element(index, placement))
     elements.extend(arrows)
     for index, placement in enumerate(layout.placements, start=1):
         related_arrows = [
@@ -82,6 +93,7 @@ def _base_element(
     background_color: str = "transparent",
     roughness: int = 1,
     roundness: Optional[Dict[str, int]] = None,
+    stroke_style: str = "solid",
 ) -> Element:
     return {
         "id": element_id,
@@ -95,7 +107,7 @@ def _base_element(
         "backgroundColor": background_color,
         "fillStyle": "solid",
         "strokeWidth": 2,
-        "strokeStyle": "solid",
+        "strokeStyle": stroke_style,
         "roughness": roughness,
         "opacity": 100,
         "groupIds": [],
@@ -133,6 +145,95 @@ def _shape_element(
         {"id": f"node-{index}-label", "type": "text"},
         *({"id": arrow_id, "type": "arrow"} for arrow_id in related_arrows),
     ]
+    return element
+
+
+def _swimlane_element(
+    index: int, placement: SwimlanePlacement
+) -> Element:
+    return _base_element(
+        f"swimlane-{index}-boundary",
+        "rectangle",
+        placement.x,
+        placement.y,
+        placement.width,
+        placement.height,
+        stroke_color="#868e96",
+        background_color="#f8f9fa",
+        roughness=0,
+        roundness={"type": 3},
+    )
+
+
+def _swimlane_label_element(
+    index: int, placement: SwimlanePlacement
+) -> Element:
+    return _boundary_label_element(
+        f"swimlane-{index}-label",
+        placement.swimlane.label,
+        placement.x,
+        placement.y,
+        "#495057",
+    )
+
+
+def _group_element(index: int, placement: GroupPlacement) -> Element:
+    return _base_element(
+        f"group-{index}-boundary",
+        "rectangle",
+        placement.x,
+        placement.y,
+        placement.width,
+        placement.height,
+        stroke_color="#4c6ef5",
+        background_color="#edf2ff",
+        roughness=0,
+        roundness={"type": 3},
+        stroke_style="dashed",
+    )
+
+
+def _group_label_element(index: int, placement: GroupPlacement) -> Element:
+    return _boundary_label_element(
+        f"group-{index}-label",
+        placement.group.label,
+        placement.x,
+        placement.y,
+        "#364fc7",
+    )
+
+
+def _boundary_label_element(
+    element_id: str,
+    label: str,
+    boundary_x: int,
+    boundary_y: int,
+    color: str,
+) -> Element:
+    width, height = _text_dimensions(label, 18)
+    element = _base_element(
+        element_id,
+        "text",
+        boundary_x + 20,
+        boundary_y + 12,
+        width,
+        height,
+        stroke_color=color,
+        roughness=0,
+    )
+    element.update(
+        {
+            "fontSize": 18,
+            "fontFamily": 1,
+            "text": label,
+            "textAlign": "left",
+            "verticalAlign": "top",
+            "containerId": None,
+            "originalText": label,
+            "autoResize": True,
+            "lineHeight": 1.25,
+        }
+    )
     return element
 
 

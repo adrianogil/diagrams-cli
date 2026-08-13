@@ -1,0 +1,30 @@
+---
+title: "Order Platform Boundaries"
+---
+flowchart LR
+    subgraph swimlane_1["Synchronous Request Path"]
+        direction LR
+        node_1(["Customer"])
+        subgraph group_1["Request Services"]
+            direction LR
+            node_2["API Gateway"]
+            node_3["Orders Service"]
+        end
+        node_4[("Orders Database")]
+    end
+    subgraph swimlane_2["Asynchronous Processing"]
+        direction LR
+        subgraph group_2["Background Workers"]
+            direction LR
+            node_5[["Order Jobs"]]
+            node_6["Fulfillment Worker"]
+        end
+        node_7[("Audit Store")]
+    end
+
+    node_1 -->|"HTTPS"| node_2
+    node_2 -->|"Route order"| node_3
+    node_3 -->|"Persist"| node_4
+    node_3 -->|"Enqueue"| node_5
+    node_5 -->|"Consume"| node_6
+    node_6 -->|"Record"| node_7

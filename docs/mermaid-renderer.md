@@ -36,6 +36,19 @@ Mermaid shapes:
 Edges use directed arrows and retain optional labels. A diagram title is
 written through Mermaid YAML frontmatter.
 
+## Groups and swimlanes
+
+Both portable boundary types render as named Mermaid `subgraph` blocks.
+Swimlane blocks use aliases such as `swimlane_1`; group blocks use aliases such
+as `group_1`. A group shared by one lane is nested inside that lane. Each block
+repeats the diagram's `TD` or `LR` direction so its members follow the same
+reading direction as the overall flowchart.
+
+Validated member order determines where a nested group is encountered. Nodes
+are declared once, while edges remain outside subgraphs so relationships can
+cross any boundary. Boundary labels use the same escaping as node and edge
+labels, and source boundary IDs never become Mermaid identifiers.
+
 ## Determinism and safety
 
 Nodes receive aliases such as `node_1` in input order, so user-controlled IDs
@@ -46,3 +59,6 @@ byte-identical and ends with one newline.
 
 The backend emits Mermaid source only. Rendering SVG or PNG remains the
 responsibility of Mermaid-compatible tools and Markdown viewers.
+
+The boundary example has a checked-in representative Mermaid golden at
+`examples/mermaid/31-platform-boundaries.mmd`.

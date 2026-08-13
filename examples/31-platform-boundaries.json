@@ -1,0 +1,45 @@
+{
+  "title": "Order Platform Boundaries",
+  "direction": "left-to-right",
+  "nodes": [
+    {"id": "client", "label": "Customer", "type": "actor"},
+    {"id": "gateway", "label": "API Gateway", "type": "service"},
+    {"id": "orders", "label": "Orders Service", "type": "service"},
+    {"id": "database", "label": "Orders Database", "type": "database"},
+    {"id": "jobs", "label": "Order Jobs", "type": "queue"},
+    {"id": "worker", "label": "Fulfillment Worker", "type": "service"},
+    {"id": "audit", "label": "Audit Store", "type": "database"}
+  ],
+  "groups": [
+    {
+      "id": "request-services",
+      "label": "Request Services",
+      "members": ["gateway", "orders"]
+    },
+    {
+      "id": "background-workers",
+      "label": "Background Workers",
+      "members": ["jobs", "worker"]
+    }
+  ],
+  "swimlanes": [
+    {
+      "id": "request-path",
+      "label": "Synchronous Request Path",
+      "members": ["client", "gateway", "orders", "database"]
+    },
+    {
+      "id": "background-path",
+      "label": "Asynchronous Processing",
+      "members": ["jobs", "worker", "audit"]
+    }
+  ],
+  "edges": [
+    {"from": "client", "to": "gateway", "label": "HTTPS"},
+    {"from": "gateway", "to": "orders", "label": "Route order"},
+    {"from": "orders", "to": "database", "label": "Persist"},
+    {"from": "orders", "to": "jobs", "label": "Enqueue"},
+    {"from": "jobs", "to": "worker", "label": "Consume"},
+    {"from": "worker", "to": "audit", "label": "Record"}
+  ]
+}

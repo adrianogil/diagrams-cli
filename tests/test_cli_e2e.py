@@ -162,13 +162,16 @@ class InstalledCliTests(unittest.TestCase):
                 self.assertEqual(result.stdout, expected)
                 self.assertEqual(result.stderr, "")
 
-    def test_installed_console_generates_mermaid(self) -> None:
-        source = EXAMPLES_DIRECTORY / "01-empty-diagram.json"
+    def test_installed_console_matches_boundary_mermaid_golden(self) -> None:
+        source = EXAMPLES_DIRECTORY / "31-platform-boundaries.json"
+        expected = (
+            EXAMPLES_DIRECTORY / "mermaid" / "31-platform-boundaries.mmd"
+        ).read_text(encoding="utf-8")
 
         result = self._run_console(str(source), "--format", "mermaid")
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout, "flowchart TD\n")
+        self.assertEqual(result.stdout, expected)
         self.assertEqual(result.stderr, "")
 
     def test_both_installed_entry_points_write_golden_files(self) -> None:

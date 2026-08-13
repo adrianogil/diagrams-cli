@@ -7,7 +7,8 @@ description.
 
 The renderer-independent diagram model, UTF-8 JSON loader, schema validation,
 and deterministic PlantUML, Excalidraw, and Mermaid renderers are implemented.
-All formats support stdout and protected output files.
+Portable groups and swimlanes represent architectural boundaries in every
+format. All formats support stdout and protected output files.
 
 See the detailed documentation:
 
@@ -17,7 +18,7 @@ See the detailed documentation:
 - [Mermaid renderer](docs/mermaid-renderer.md)
 - [Output files and overwrite protection](docs/output-files.md)
 - [Implementation plan](docs/implementation-plan.md)
-- [Thirty sample diagrams and golden outputs](docs/samples.md)
+- [Thirty-one sample diagrams and golden outputs](docs/samples.md)
 - [Testing, golden fixtures, and installed CLI coverage](docs/testing.md)
 
 ## Installation
@@ -56,6 +57,14 @@ Generate Mermaid flowchart text:
 diagrams-cli examples/04-database-flow.json \
   --format mermaid \
   -o database-flow.mmd
+```
+
+Generate the boundary example in any format:
+
+```bash
+diagrams-cli examples/31-platform-boundaries.json --format plantuml
+diagrams-cli examples/31-platform-boundaries.json --format excalidraw
+diagrams-cli examples/31-platform-boundaries.json --format mermaid
 ```
 
 All formats are exercised from an isolated wheel installation by the

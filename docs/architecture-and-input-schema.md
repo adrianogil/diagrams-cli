@@ -15,7 +15,7 @@ UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
 ## Package responsibilities
 
 - `diagrams_cli.model` defines the immutable, renderer-independent domain
-  model: `Diagram`, `Node`, and `Edge`.
+  model: `Diagram`, `Node`, `Edge`, `Group`, and `Swimlane`.
 - `diagrams_cli.validation` validates decoded JSON values and converts them
   into the domain model.
 - `diagrams_cli.loader` reads UTF-8 JSON files or JSON strings and delegates
@@ -25,8 +25,8 @@ UTF-8 JSON file -> JSON decoding -> schema validation -> diagram model
 - `diagrams_cli.renderers.plantuml` produces deterministic PlantUML source.
 - `diagrams_cli.renderers.mermaid` produces deterministic Mermaid flowchart
   text.
-- `diagrams_cli.layout` assigns deterministic, non-overlapping node positions
-  by graph depth, direction, and input order.
+- `diagrams_cli.layout` assigns deterministic, non-overlapping node and
+  boundary positions by graph depth, direction, membership, and input order.
 - `diagrams_cli.renderers.excalidraw` produces deterministic editable
   Excalidraw JSON with shapes, labels, and bound arrows.
 - `diagrams_cli.output` validates format extensions and writes output without
@@ -48,6 +48,8 @@ A document is a JSON object with these fields:
 | `direction` | No | `top-to-bottom` or `left-to-right` | `top-to-bottom` |
 | `nodes` | Yes | Array of node objects | None |
 | `edges` | No | Array of edge objects | Empty array |
+| `groups` | No | Array of group objects | Empty array |
+| `swimlanes` | No | Array of swimlane objects | Empty array |
 
 Unknown fields are rejected so spelling mistakes do not silently change a
 diagram.
@@ -78,6 +80,34 @@ Each directed edge supports:
 Both endpoints must reference nodes declared in the same document. Self-edges
 and multiple edges between the same pair of nodes are currently allowed.
 
+### Groups and swimlanes
+
+Groups and swimlanes use the same boundary fields:
+
+| Field | Required | Type | Default |
+| --- | --- | --- | --- |
+| `id` | Yes | Non-empty boundary ID, unique across both arrays | None |
+| `label` | Yes | Non-empty display string | None |
+| `members` | Yes | Non-empty array of node IDs | None |
+
+Membership is deliberately renderer-independent:
+
+- Every member must name an existing node, and a boundary cannot repeat a
+  member.
+- A node can belong to at most one group and at most one swimlane.
+- A node may belong to both one group and one swimlane. In that case every
+  member of the group must belong to that same swimlane, so the group has one
+  unambiguous lane parent.
+- A group cannot mix lane-assigned and lane-free nodes or span lanes.
+- Boundaries contain nodes only. Boundary IDs cannot appear in `members`, so
+  recursive group or swimlane nesting is not part of this schema version.
+
+Arrays and `members` retain their declared order. Renderers emit lanes in
+swimlane order, encounter nested groups at the first matching member, preserve
+member order inside groups, and then emit lane-free content by node order.
+This is deterministic even when node declaration order differs from boundary
+membership order.
+
 ## Complete example
 
 ```json
@@ -99,6 +129,20 @@ and multiple edges between the same pair of nodes are currently allowed.
       "id": "orders-db",
       "label": "Orders DB",
       "type": "database"
+    }
+  ],
+  "groups": [
+    {
+      "id": "order-services",
+      "label": "Order Services",
+      "members": ["api", "orders-db"]
+    }
+  ],
+  "swimlanes": [
+    {
+      "id": "cloud",
+      "label": "Cloud",
+      "members": ["api", "orders-db"]
     }
   ],
   "edges": [
@@ -142,9 +186,23 @@ from diagrams_cli.validation import parse_diagram
 diagram = parse_diagram({"nodes": []})
 ```
 
-The returned data classes are frozen and use tuples for node and edge
-collections. Renderers can therefore consume them without mutating validated
-input state.
+The returned data classes are frozen and use tuples for node, edge, boundary,
+and membership collections. Renderers can therefore consume them without
+mutating validated input state.
+
+## Schema compatibility
+
+`groups` and `swimlanes` are optional and default to empty tuples, so every
+document valid before this extension remains valid. When both are absent, all
+three renderers and the Excalidraw layout stay on their original paths; the
+existing thirty fixture outputs remain byte-identical.
+
+The schema remains strict: unknown fields are rejected rather than ignored.
+Future backward-compatible additions should therefore be optional root or
+object fields with behavior-preserving defaults. Any change that reinterprets
+existing membership, permits ambiguous nesting, or removes a supported value
+requires an explicit schema-version strategy rather than silently changing
+the current contract.
 
 ## Errors
 
@@ -170,12 +228,13 @@ argument and path checks retain their current CLI behavior.
   future stdin path.
 - PlantUML source is written to stdout; image rendering is not invoked.
 - Mermaid source is generated without invoking the Mermaid CLI or a browser.
-- Styling, groups, node coordinates, and renderer-specific options are not
-  part of the initial portable schema.
+- Styling, explicit node coordinates, arbitrary boundary nesting, and
+  renderer-specific options are not part of the portable schema.
 - Excalidraw layout does not route arrows or labels around unrelated elements.
 
-Thirty inputs and golden results from both CLI format paths are available in
+Thirty-one inputs and golden results from both primary CLI format paths are available in
 [Sample diagrams](samples.md). The original ten form a complexity progression;
 twenty focused scenarios add self-loops, disconnected graphs, cycles, joins,
-feedback paths, and varied application domains. Layout and output details are
+feedback paths, and varied application domains. The final example adds groups,
+swimlanes, and a representative Mermaid golden. Layout and output details are
 covered in [Excalidraw renderer](excalidraw-renderer.md).

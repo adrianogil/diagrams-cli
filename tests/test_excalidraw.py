@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from diagrams_cli.model import Diagram, Edge, Node
+from diagrams_cli.model import Diagram, Edge, Group, Node, Swimlane
 from diagrams_cli.renderers import Renderer, render_excalidraw
 
 
@@ -127,6 +127,56 @@ class ExcalidrawRendererTests(unittest.TestCase):
         self.assertTrue(all(element["seed"] > 0 for element in elements))
         self.assertTrue(all(element["versionNonce"] > 0 for element in elements))
         self.assertTrue(first.endswith("\n"))
+
+    def test_renders_readable_group_and_swimlane_boundaries(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("a", "A"), Node("b", "B"), Node("c", "C")),
+            edges=(Edge("a", "b"), Edge("b", "c")),
+            groups=(Group("services", "Services", ("a", "b")),),
+            swimlanes=(Swimlane("cloud", "Cloud", ("a", "b", "c")),),
+            direction="left-to-right",
+        )
+
+        document = json.loads(render_excalidraw(diagram))
+        elements = {element["id"]: element for element in document["elements"]}
+        element_ids = [element["id"] for element in document["elements"]]
+        lane = elements["swimlane-1-boundary"]
+        group = elements["group-1-boundary"]
+
+        self.assertLess(
+            element_ids.index("swimlane-1-boundary"),
+            element_ids.index("edge-1"),
+        )
+        self.assertLess(
+            element_ids.index("group-1-boundary"),
+            element_ids.index("node-1-shape"),
+        )
+        self.assertEqual(elements["swimlane-1-label"]["text"], "Cloud")
+        self.assertEqual(elements["group-1-label"]["text"], "Services")
+        self.assertEqual(group["strokeStyle"], "dashed")
+        self.assertGreaterEqual(group["x"], lane["x"])
+        self.assertGreaterEqual(group["y"], lane["y"])
+        self.assertLessEqual(
+            group["x"] + group["width"], lane["x"] + lane["width"]
+        )
+        self.assertLessEqual(
+            group["y"] + group["height"], lane["y"] + lane["height"]
+        )
+
+    def test_boundary_text_is_preserved_as_json_data(self) -> None:
+        diagram = Diagram(
+            nodes=(Node("a", "A"),),
+            groups=(Group("g", 'Group "one"\n<script>', ("a",)),),
+        )
+
+        document = json.loads(render_excalidraw(diagram))
+        label = next(
+            element
+            for element in document["elements"]
+            if element["id"] == "group-1-label"
+        )
+
+        self.assertEqual(label["text"], 'Group "one"\n<script>')
 
 
 if __name__ == "__main__":
